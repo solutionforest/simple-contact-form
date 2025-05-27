@@ -2,16 +2,13 @@
 
 namespace SolutionForest\SimpleContactForm;
 
-use SolutionForest\SimpleContactForm\ContactFormResource\Pages;
-use SolutionForest\SimpleContactForm\ContactFormResource\RelationManagers;
-use SolutionForest\SimpleContactForm\Models\ContactForm;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use SolutionForest\SimpleContactForm\ContactFormResource\Pages;
+use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class ContactFormResource extends Resource
 {
@@ -33,7 +30,7 @@ class ContactFormResource extends Resource
                 // Forms\Components\TextInput::make('subject')
                 //     ->required()
                 //     ->maxLength(255),
-              
+
                 Forms\Components\MarkdownEditor::make('content')
                     ->required(),
                 // Forms\Components\TextInput::make('from')
@@ -44,7 +41,6 @@ class ContactFormResource extends Resource
                 //     ->maxLength(255),
             ]);
 
-            
     }
 
     public static function table(Table $table): Table

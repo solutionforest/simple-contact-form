@@ -2,9 +2,9 @@
 
 namespace SolutionForest\SimpleContactForm\ContactFormResource\Pages;
 
-use SolutionForest\SimpleContactForm\ContactFormResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use SolutionForest\SimpleContactForm\ContactFormResource;
 
 class ListContactForms extends ListRecords
 {

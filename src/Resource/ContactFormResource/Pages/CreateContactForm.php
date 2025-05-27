@@ -2,9 +2,8 @@
 
 namespace SolutionForest\SimpleContactForm\ContactFormResource\Pages;
 
-use SolutionForest\SimpleContactForm\ContactFormResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use SolutionForest\SimpleContactForm\ContactFormResource;
 
 class CreateContactForm extends CreateRecord
 {

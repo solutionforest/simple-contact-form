@@ -11,6 +11,7 @@ class contactForm extends Model
     use HasFactory;
 
     protected $table = 'simple_contact_form_table';
+
     protected $fillable = [
         'name',
         'email',
@@ -21,5 +22,4 @@ class contactForm extends Model
         'created_at',
         'updated_at',
     ];
-
 }
