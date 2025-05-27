@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace SolutionForest\SimpleContactForm\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class SimpleContactFormCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'simple-contact-form';
 
     public $description = 'My command';
 

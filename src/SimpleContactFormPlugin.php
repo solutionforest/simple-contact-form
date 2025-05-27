@@ -1,15 +1,15 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace SolutionForest\SimpleContactForm;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class SkeletonPlugin implements Plugin
+class SimpleContactFormPlugin implements Plugin
 {
     public function getId(): string
     {
-        return 'skeleton';
+        return 'simple-contact-form';
     }
 
     public function register(Panel $panel): void
