@@ -10,11 +10,11 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
+use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
+use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
-use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
 
 class SimpleContactFormServiceProvider extends PackageServiceProvider
 {
