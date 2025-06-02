@@ -147,7 +147,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
     protected function getMigrations(): array
     {
         return [
-            'create_simple-contact-form_table',
+            'create_simple_contact_form_table',
         ];
     }
 }
