@@ -84,7 +84,11 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
                 ], 'simple-contact-form-stubs');
             }
         }
-
+        //   if (class_exists(\Filament\Facades\Filament::class)) {
+        //     \Filament\Facades\Filament::registerPlugin(
+        //         \SolutionForest\SimpleContactForm\SimpleContactFormPlugin::make()
+        //     );
+        // }
         // Testing
         Testable::mixin(new TestsSimpleContactForm);
     }

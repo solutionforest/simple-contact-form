@@ -1,9 +1,9 @@
 <?php
 
-namespace SolutionForest\SimpleContactForm\ContactFormResource\Pages;
+namespace SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use SolutionForest\SimpleContactForm\ContactFormResource;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
 
 class CreateContactForm extends CreateRecord
 {

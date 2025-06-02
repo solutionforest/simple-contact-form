@@ -1,10 +1,10 @@
 <?php
 
-namespace SolutionForest\SimpleContactForm\ContactFormResource\Pages;
+namespace SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use SolutionForest\SimpleContactForm\ContactFormResource;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
 
 class ListContactForms extends ListRecords
 {

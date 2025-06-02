@@ -1,13 +1,13 @@
 <?php
 
-namespace SolutionForest\SimpleContactForm;
+namespace SolutionForest\SimpleContactForm\Resources;
 
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use SolutionForest\SimpleContactForm\ContactFormResource\Pages;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class ContactFormResource extends Resource

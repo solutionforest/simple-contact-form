@@ -4,6 +4,7 @@ namespace SolutionForest\SimpleContactForm;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
 
 class SimpleContactFormPlugin implements Plugin
 {
