@@ -7,8 +7,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 
 class ContactFormResource extends Resource
 {
