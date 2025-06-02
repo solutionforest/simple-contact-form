@@ -22,7 +22,8 @@ class ContactForm extends Model
         'created_at',
         'updated_at',
     ];
+
     protected $casts = [
-    'content' => 'array',
-];
+        'content' => 'array',
+    ];
 }
