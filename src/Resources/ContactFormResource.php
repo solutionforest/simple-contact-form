@@ -2,24 +2,22 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
+use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
-use PHPUnit\Framework\TestStatus\Notice;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
-use SolutionForest\SimpleContactForm\Forms\Components\CustomModal;
-use Filament\Actions\Action;
-use Filament\Forms\Components\Actions\Action as FormAction;
+
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
@@ -39,7 +37,7 @@ class ContactFormResource extends Resource
                         Tabs\Tab::make('Template')
                             ->schema([
                                 Forms\Components\Actions::make(self::getModelaction()),
-                                    
+
                                 Textarea::make('content')
                                     ->label('Content')
                                     ->required()
@@ -47,10 +45,9 @@ class ContactFormResource extends Resource
                                     ->helperText('You can use the tags to define the type of input you want to use.')
                                     ->rows(10)
                                     ->cols(20),
-                                
 
                             ]),
-                            
+
                         Tabs\Tab::make('Mail')
                             ->schema([
                                 Forms\Components\TextInput::make('email')
@@ -87,13 +84,13 @@ class ContactFormResource extends Resource
                                         // $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
                                         // foreach ($variables as $var) {
                                         //     $html .= '<div
-                                        //             onclick="navigator.clipboard.writeText(\'{' . $var . '}\');  " 
+                                        //             onclick="navigator.clipboard.writeText(\'{' . $var . '}\');  "
                                         //             style="background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-family: monospace; position: relative;"
-                                                   
-                                        //             onmouseover="this.style.backgroundColor=\'#e5e7eb\'" 
+
+                                        //             onmouseover="this.style.backgroundColor=\'#e5e7eb\'"
                                         //             onmouseout="this.style.backgroundColor=\'#f3f4f6\'">
                                         //             ' . $var . '
-                                                   
+
                                         //         </div>';
                                         // }
 
@@ -108,12 +105,10 @@ class ContactFormResource extends Resource
                             ]),
                     ])
                     ->columnSpanFull(),
-                    
+
             ]);
 
     }
-
-
 
     public static function table(Table $table): Table
     {
@@ -174,29 +169,27 @@ class ContactFormResource extends Resource
         ];
     }
 
-   
-
     public static function getModelaction(): array
-    {   
+    {
         $actionsList = ['text', 'email', 'url', 'tel', 'number', 'date', 'textarea', 'select', 'checkbox', 'radio', 'file'];
         $actions = [];
-        
+
         foreach ($actionsList as $actionType) {
             $actions[$actionType] = FormAction::make($actionType)
-            ->label(ucfirst($actionType))
-            ->color('primary')
-            ->form(self::getModalForm($actionType)) 
+                ->label(ucfirst($actionType))
+                ->color('primary')
+                ->form(self::getModalForm($actionType))
             // ->slideOver()
-            ->action(function (array $data) use ($actionType) {
-                // Empty action for now
-            });
+                ->action(function (array $data) {
+                    // Empty action for now
+                });
         }
-       
 
         return $actions;
     }
 
-    public static function getModalForm($actionType):array{
+    public static function getModalForm($actionType): array
+    {
         $fields = [
             Forms\Components\TextInput::make('label')
                 ->label('Field Label')
@@ -208,33 +201,33 @@ class ContactFormResource extends Resource
             Forms\Components\Toggle::make('required')
                 ->label('Required Field')
                 ->default(true),
-        ]; 
+        ];
         if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox'])) {
             $fields[] = Repeater::make('options')
-            ->schema([
-                Forms\Components\TextInput::make('label')
-                ->label('option label')
-                ->required()
-                ->maxLength(255)
-                ->live()
-                ->reactive()
-                ->afterStateUpdated(function ($state, $set) {
-                    $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
-                    $set('key', $generatedKey);
-                }),
-                Forms\Components\TextInput::make('key')
-                ->label('key')
-                ->required()
-                ->readOnly()
-                ->maxLength(255),
-            ])
-            ->columns(2)
-            ->collapsible()
-            ->collapsed()
-            ->minItems(1)
-            ->maxItems(10)
-            ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
-        }elseif (strtolower($actionType) === 'file') {
+                ->schema([
+                    Forms\Components\TextInput::make('label')
+                        ->label('option label')
+                        ->required()
+                        ->maxLength(255)
+                        ->live()
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, $set) {
+                            $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
+                            $set('key', $generatedKey);
+                        }),
+                    Forms\Components\TextInput::make('key')
+                        ->label('key')
+                        ->required()
+                        ->readOnly()
+                        ->maxLength(255),
+                ])
+                ->columns(2)
+                ->collapsible()
+                ->collapsed()
+                ->minItems(1)
+                ->maxItems(10)
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
+        } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\TextInput::make('file_types')
                 ->label('Allowed File Types')
                 ->placeholder('e.g. jpg,png,pdf')
@@ -244,15 +237,14 @@ class ContactFormResource extends Resource
                 ->numeric()
                 ->default(5)
                 ->helperText('Maximum file size in megabytes');
-        }else{
+        } else {
             $fields[] = Forms\Components\TextInput::make('placeholder')
                 ->label('Placeholder Text')
                 ->helperText('Optional placeholder text for the field');
         }
+
         return $fields;
     }
 
-    public static function handleContentAdd($data){
-
-    }
+    public static function handleContentAdd($data) {}
 }
