@@ -24,7 +24,7 @@ class ContactForm extends Model
         'email_body',
     ];
 
-    protected $casts = [
-        'content' => 'array',
-    ];
+    // protected $casts = [
+    //     'content' => 'array',
+    // ];
 }
