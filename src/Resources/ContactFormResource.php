@@ -4,19 +4,17 @@ namespace SolutionForest\SimpleContactForm\Resources;
 
 use Filament\Forms;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
-use Filament\Forms\Components\Toggle;
-use Laravel\Prompts\Key;
-use Filament\Forms\Components\Placeholder;
-use Closure;
-use Illuminate\Support\HtmlString;
+
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
@@ -42,7 +40,7 @@ class ContactFormResource extends Resource
                                     ->collapsible()
                                     ->collapsed()
                                     ->live()
-                                    ->itemLabel(fn(array $state): ?string => $state['label'] ?? null),
+                                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? null),
                             ]),
                         Tabs\Tab::make('Mail')
                             ->schema([
@@ -79,7 +77,7 @@ class ContactFormResource extends Resource
                                         }
                                         $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
                                         foreach ($variables as $var) {
-                                             $html .= '<div
+                                            $html .= '<div
                                                     onclick="navigator.clipboard.writeText(\'{' . $var . '}\');  " 
                                                     style="background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-family: monospace; position: relative;"
                                                    
@@ -171,9 +169,8 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->visible(fn($get) => in_array($get('type'), ['select', 'radio', 'checkbox']))
-                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null),
-
+                ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox']))
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null),
 
         ];
 
