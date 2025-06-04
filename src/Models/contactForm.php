@@ -21,6 +21,7 @@ class ContactForm extends Model
         'to',
         'created_at',
         'updated_at',
+        'email_body'
     ];
     protected $casts = [
     'content' => 'array',

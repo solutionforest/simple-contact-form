@@ -15,7 +15,9 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Toggle;
 use Laravel\Prompts\Key;
-
+use Filament\Forms\Components\Placeholder;
+use Closure;
+use Illuminate\Support\HtmlString;
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
@@ -27,20 +29,21 @@ class ContactFormResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
                 Tabs::make('Tabs')
                     ->tabs([
                         Tabs\Tab::make('Template')
                             ->schema([
-                               
+
                                 Repeater::make('content')
                                     ->schema(self::getTemplateContent())
                                     ->addActionLabel('Add content')
                                     ->collapsible()
                                     ->collapsed()
-                                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? null),
+                                    ->live()
+                                    ->itemLabel(fn(array $state): ?string => $state['label'] ?? null),
                             ]),
                         Tabs\Tab::make('Mail')
                             ->schema([
@@ -60,15 +63,45 @@ class ContactFormResource extends Resource
                             ]),
                         Tabs\Tab::make('Email body')
                             ->schema([
-                              MarkdownEditor::make('email_body')
-                                ->label('Email body')
-                                ->required()
-                                ->columnSpanFull()
-                                ->helperText('You can use the following variables: {{name}}, {{email}}, {{subject}}, {{content}}'),
+
+                                Placeholder::make('available_variables')
+                                    ->label('Available variables')
+                                    ->content(function (Forms\Get $get) {
+                                        $content = $get('content') ?? [];
+                                        $variables = [];
+                                        foreach ($content as $field) {
+                                            if (isset($field['label'])) {
+                                                $key = \Illuminate\Support\Str::slug($field['label'], '_');
+                                                $variables[] = "{{$key}}";
+                                            }
+                                        }
+                                        if (empty($variables)) {
+                                            return new HtmlString('<div style="text-align: center; padding: 10px; color: #666;">No variables are currently defined</div>');
+                                        }
+                                        $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                                        foreach ($variables as $var) {
+                                             $html .= '<div
+                                                    onclick="navigator.clipboard.writeText(\'{' . $var . '}\');  " 
+                                                    style="background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-family: monospace; position: relative;"
+                                                   
+                                                    onmouseover="this.style.backgroundColor=\'#e5e7eb\'" 
+                                                    onmouseout="this.style.backgroundColor=\'#f3f4f6\'">
+                                                    ' . $var . '
+                                                   
+                                                </div>';
+                                        }
+
+                                        return new HtmlString($html);
+                                    })
+                                    ->columnSpanFull(),
+                                MarkdownEditor::make('email_body')
+                                    ->label('Email body')
+                                    ->required()
+                                    ->columnSpanFull()
+                                    ->helperText('You can use the variables like : user name : {{name}}'),
                             ]),
                     ])
                     ->columnSpanFull(),
-
             ]);
 
     }
@@ -78,8 +111,10 @@ class ContactFormResource extends Resource
         return [
             Forms\Components\TextInput::make('label')
                 ->required()
-                ->unique()
-                ->columnSpanFull(),
+                // ->unique()
+                ->columnSpanFull()
+                ->distinct(),
+
             Forms\Components\TextArea::make('description')
                 ->required()
                 ->columnSpanFull(),
@@ -137,9 +172,9 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->visible(fn ($get) => in_array($get('type'), ['select', 'radio', 'checkbox']))
-                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null),
-            
+                ->visible(fn($get) => in_array($get('type'), ['select', 'radio', 'checkbox']))
+                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null),
+
 
         ];
 
