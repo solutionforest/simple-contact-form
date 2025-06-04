@@ -3,16 +3,15 @@
 namespace SolutionForest\SimpleContactForm\Resources;
 
 use Filament\Forms;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Toggle;
 use Laravel\Prompts\Key;
 use Filament\Forms\Components\Placeholder;
@@ -142,7 +141,7 @@ class ContactFormResource extends Resource
                         ->required()
                         ->live()
                         ->afterStateUpdated(function ($state, $set) {
-                            if (!in_array($state, ['select', 'radio', 'checkbox'])) {
+                            if (! in_array($state, ['select', 'radio', 'checkbox'])) {
                                 $set('options', []);
                             }
                         }),
@@ -206,10 +205,10 @@ class ContactFormResource extends Resource
                 //     ->dateTime()
                 //     ->sortable(),
             ])->filters([
-                    //
-                ])->headerActions([
-                    // Tables\Actions\CreateAction::make(),
-                ])
+                //
+            ])->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 //
             ])
