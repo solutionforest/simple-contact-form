@@ -5,11 +5,15 @@ namespace SolutionForest\SimpleContactForm\Resources;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as FormAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -24,8 +28,12 @@ class ContactFormResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public function mount():void{
+       
+    }
     public static function form(Form $form): Form
-    {
+    {   
+        
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
@@ -38,20 +46,97 @@ class ContactFormResource extends Resource
                             ->schema([
                                 Forms\Components\Actions::make(self::getModelaction()),
 
-                                Textarea::make('content')
+                                Placeholder::make('content_placeholder')
+                                    ->label('Usage')
+                                    ->content(new HtmlString('the item you add will display as following :
+                                                        [type | label | placeholder / options / [ accept | max_size ] ]'))
+                                    ->columnSpanFull(),
+                                Repeater::make('content')
                                     ->label('Content')
-                                    ->required()
                                     ->columnSpanFull()
-                                    ->helperText('You can use the tags to define the type of input you want to use.')
-                                    ->rows(10)
-                                    ->cols(20),
+                                    ->collapsed(true)
+                                    ->collapsible(false)
+                                    ->itemLabel(fn (array $state): ?string => $state['string'] ?? null )
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                                    ->label('Field name')
+                                                    // ->distinct()
+                                                    ->nullable()
+                                                    ->readOnly(),
+                            
+                                        ])
+                                    ->extraItemActions([
+                                        FormAction::make('edit')
+                                            ->label('Edit')
+                                            ->icon('heroicon-o-pencil')
+                                            ->form(function (array $arguments,$livewire) {
+                                                $content = $livewire->data['content'] ?? [];
+                                                $record = $content[$arguments['item']];
+                                                $type = $record['type'] ?? 'text';
+                                                $formSchema = self::getModalForm($type);
+                                                foreach ($formSchema as &$field) {
+                                                    $fieldName = $field->getName();
+                                                    if (isset($record[$fieldName])) {
+                                                        $field->default($record[$fieldName]);
+                                                    }
+                                                }
 
+                                                return $formSchema;
+                                            })
+                                             ->action(function (array $data, $livewire,$arguments)  {
+                                                $content = $livewire->data['content'] ?? [];
+                                                $record = $content[$arguments['item']];
+                                                $type = $record['type'] ?? 'text';
+                                                $newItem = self::handleContentAdd($data, $type);
+                                                $content[$arguments['item']] = $newItem;
+                                                $livewire->data['content'] = $content;
+                                                // return ;
+                                            })
+                                           
+                                             
+                                    ])
+                                    ->defaultItems(0)
+                                    ->addable(false),
                             ]),
-
+                      
                         Tabs\Tab::make('Mail')
                             ->schema([
+                                // Forms\Components\Actions::make(self::getItemCopyActions()),
+                                ToggleButtons::make('available_variables')
+                                    ->label('Available variables')
+                                    ->options(function (Forms\Get $get) {
+                                        $content = $get('content') ?? [];
+                                        $variables = [];
+                                        foreach ($content as $field) {
+                                            if (isset($field['name'])) {
+                                                $key = \Illuminate\Support\Str::slug($field['name'], '_');
+                                                $variables[$key] = "{{{$key}}}";
+                                            }
+                                        }
+                                        return $variables;
+                                    })
+                                    ->live()
+                                                                      
+                                    ->extraAttributes([
+                                        'x-data' => '{}',
+                                        'x-init' => '
+                                            $el.addEventListener("click", function(e) {
+                                                const label = e.target.closest(".fi-btn-label");
+                                                if (label) {
+                                                    const text = label.textContent.trim();
+                                                    if (text && text.includes("{{")) {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        navigator.clipboard.writeText(text);
+                                                }
+                                            });
+                                        '
+                                    ])
+                                    ->inline()
+                                    ->helperText('You can use these variables in your email '),
+                                
                                 Forms\Components\TextInput::make('email')
-                                    ->email()
+                                    // ->email()
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('subject')
@@ -63,57 +148,54 @@ class ContactFormResource extends Resource
                                 Forms\Components\TextInput::make('to')
                                     ->required()
                                     ->maxLength(255),
-                            ]),
-                        Tabs\Tab::make('Email body')
-                            ->schema([
-
-                                Placeholder::make('available_variables')
-                                    ->label('Available variables')
-                                    ->content(function (Forms\Get $get) {
-                                        $content = $get('content') ?? [];
-                                        // $variables = [];
-                                        // foreach ($content as $field) {
-                                        //     if (isset($field['label'])) {
-                                        //         $key = \Illuminate\Support\Str::slug($field['label'], '_');
-                                        //         $variables[] = "{{$key}}";
-                                        //     }
-                                        // }
-                                        // if (empty($variables)) {
-                                        //     return new HtmlString('<div style="text-align: center; padding: 10px; color: #666;">No variables are currently defined</div>');
-                                        // }
-                                        // $html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
-                                        // foreach ($variables as $var) {
-                                        //     $html .= '<div
-                                        //             onclick="navigator.clipboard.writeText(\'{' . $var . '}\');  "
-                                        //             style="background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-family: monospace; position: relative;"
-
-                                        //             onmouseover="this.style.backgroundColor=\'#e5e7eb\'"
-                                        //             onmouseout="this.style.backgroundColor=\'#f3f4f6\'">
-                                        //             ' . $var . '
-
-                                        //         </div>';
-                                        // }
-
-                                        // return new HtmlString($html);
-                                    })
-                                    ->columnSpanFull(),
                                 MarkdownEditor::make('email_body')
                                     ->label('Email body')
                                     ->required()
                                     ->columnSpanFull()
                                     ->helperText('You can use the variables like : user name : {{name}}'),
                             ]),
+                        
+                        Tabs\Tab::make('Messages')
+                            ->schema([
+                                Forms\Components\TextInput::make('success_message')
+                                    ->label('Success message')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('Message to show after successful form submission'),
+                                Forms\Components\TextInput::make('error_message')
+                                    ->label('Error message')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('Message to show after form submission error'),
+                                Forms\Components\TextInput::make('validation_error_message')
+                                    ->label('Validation error message')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->helperText('Message to show after validation error'),
+                            ]),
+                       
                     ])
+                    
                     ->columnSpanFull(),
 
             ]);
 
     }
+    public static function getItemCopyActions():array{
 
+        
+        return [
+           
+        ];
+    }
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
@@ -126,12 +208,12 @@ class ContactFormResource extends Resource
                 // Tables\Columns\TextColumn::make('content')
                 //     ->limit(50)
                 //     ->searchable(),
-                Tables\Columns\TextColumn::make('from')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('to')
-                    ->searchable()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('from')
+                //     ->searchable()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('to')
+                //     ->searchable()
+                //     ->sortable(),
                 // Tables\Columns\TextColumn::make('created_at')
                 //     ->dateTime()
                 //     ->sortable(),
@@ -180,9 +262,13 @@ class ContactFormResource extends Resource
                 ->color('primary')
                 ->form(self::getModalForm($actionType))
             // ->slideOver()
-                ->action(function (array $data) {
-                    // Empty action for now
-                });
+                ->action(function (array $data, $livewire) use ($actionType) {
+                $content = $livewire->data['content'] ?? [];
+                $newItem = self::handleContentAdd($data, $actionType);
+                $content[] = $newItem;
+                $livewire->data['content'] = $content;
+                // return $newItem;
+            });
         }
 
         return $actions;
@@ -197,7 +283,13 @@ class ContactFormResource extends Resource
             Forms\Components\TextInput::make('name')
                 ->label('Field Name')
                 ->required()
-                ->helperText('This will be used as the form field name'),
+                ->helperText('use for identification in the email body , no spaces or special characters')
+                ->live()
+                ->afterStateUpdated(function ($state, $set) {
+                    // Convert spaces and punctuation to underscores
+                    $sanitized = preg_replace('/[\s\p{P}]+/u', '_', $state);
+                    $set('name', $sanitized);
+                }),
             Forms\Components\Toggle::make('required')
                 ->label('Required Field')
                 ->default(true),
@@ -228,10 +320,23 @@ class ContactFormResource extends Resource
                 ->maxItems(10)
                 ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
-            $fields[] = Forms\Components\TextInput::make('file_types')
+            $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
-                ->placeholder('e.g. jpg,png,pdf')
-                ->helperText('Comma-separated list of allowed file types');
+                ->multiple()
+                ->options([
+                    'jpg' => 'JPG',
+                    'jpeg' => 'JPEG',
+                    'png' => 'PNG',
+                    'pdf' => 'PDF',
+                    'doc' => 'DOC',
+                    'docx' => 'DOCX',
+                    'xls' => 'XLS',
+                    'xlsx' => 'XLSX',
+                    'txt' => 'TXT',
+                    'zip' => 'ZIP',
+                ])
+                ->searchable()
+                ->helperText('Select allowed file types');
             $fields[] = Forms\Components\TextInput::make('max_size')
                 ->label('Maximum File Size (MB)')
                 ->numeric()
@@ -246,5 +351,55 @@ class ContactFormResource extends Resource
         return $fields;
     }
 
-    public static function handleContentAdd($data) {}
+      
+    public static function handleContentAdd($data, $actionType)
+    {
+       
+        // $content = $livewire->data['content'] ?? [];
+        
+      
+        $newItem = [
+            'label' => $data['label'] ?? '',
+            'name' => $data['name'] ?? '',
+            'type' => $actionType,
+            'required' => $data['required'] ?? false,
+        ];
+        
+        $string = '[ ' . $actionType . ' | '. ($data['label'] ?? '').' | '.($data['required'] ? 'required' : 'optional') ;
+       
+        if (isset($data['placeholder'])) {
+            $newItem['placeholder'] = $data['placeholder'];
+            $string .=   ' | placeholder = [ ' .$data['placeholder'] .' ] ' ;
+        }
+        
+       
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+            $newItem['options'] = $data['options'];
+            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
+            $string .= ' | option =  [ ' . $optionsStr.' ] ' ;
+        }
+        if (strtolower($actionType) === 'file') {
+            if (isset($data['file_types'])) {
+                $newItem['file_types'] = $data['file_types'];
+                $typeStr = implode(' | ', $data['file_types']);
+                $string .= ' | accept =  [ '. $typeStr .' ]' ;
+            }
+            if (isset($data['max_size'])) {
+                $newItem['max_size'] = $data['max_size'];
+                $string .= ' | szie = '. $data['max_size'].' mb ]' ;
+            }
+        }
+
+        $string .= ' ]';
+    
+    
+        $newItem['string'] = $string;
+      
+        // $content[] = $newItem;
+        
+       
+        // $livewire->data['content'] = $content;
+       
+        return $newItem;
+    }
 }

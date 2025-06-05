@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('from')->nullable();
             $table->string('to')->nullable();
             $table->text('email_body');
+            $table->text('success_message');
+            $table->text('error_message');
+            $table->text('validation_error_message');
             $table->timestamps();
             
 
