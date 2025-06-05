@@ -176,13 +176,7 @@ class ContactFormResource extends Resource
 
     }
 
-    public static function getItemCopyActions(): array
-    {
-
-        return [
-
-        ];
-    }
+  
 
     public static function table(Table $table): Table
     {

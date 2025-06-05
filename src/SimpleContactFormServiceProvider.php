@@ -56,6 +56,9 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
         }
+        if (class_exists(\Livewire\Livewire::class)) {
+        \Livewire\Livewire::component('contact-form', \SolutionForest\SimpleContactForm\Livewire\ContactFormComponent::class);
+        }
     }
 
     public function packageRegistered(): void {}
