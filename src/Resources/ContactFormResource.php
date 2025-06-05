@@ -95,40 +95,22 @@ class ContactFormResource extends Resource
                         Tabs\Tab::make('Mail')
                             ->schema([
                                 // Forms\Components\Actions::make(self::getItemCopyActions()),
-                                ToggleButtons::make('available_variables')
-                                    ->label('Available variables')
-                                    ->options(function (Forms\Get $get) {
+                                Placeholder::make('variables_placeholder')
+                                    ->label('Available Variables :')
+                                    ->content(function (Forms\Get $get) {
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $field) {
                                             if (isset($field['name'])) {
                                                 $key = \Illuminate\Support\Str::slug($field['name'], '_');
-                                                $variables[$key] = "{{{$key}}}";
+                                                $variables[] = "{{{$key}}}";
                                             }
                                         }
-
-                                        return $variables;
+                                        
+                                        return count($variables) ?  implode(', ', $variables) : 'No variables available';
                                     })
-                                    ->live()
-
-                                    ->extraAttributes([
-                                        'x-data' => '{}',
-                                        'x-init' => '
-                                            $el.addEventListener("click", function(e) {
-                                                const label = e.target.closest(".fi-btn-label");
-                                                if (label) {
-                                                    const text = label.textContent.trim();
-                                                    if (text && text.includes("{{")) {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        navigator.clipboard.writeText(text);
-                                                }
-                                            });
-                                        ',
-                                    ])
-                                    ->inline()
-                                    ->helperText('You can use these variables in your email '),
-
+                                    ->helperText('You can use these variables in your email ')
+                                    ->columnSpanFull(),
                                 Forms\Components\TextInput::make('email')
                                     // ->email()
                                     ->required()
