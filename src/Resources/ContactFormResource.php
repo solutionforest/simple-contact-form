@@ -8,7 +8,6 @@ use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -106,8 +105,8 @@ class ContactFormResource extends Resource
                                                 $variables[] = "{{{$key}}}";
                                             }
                                         }
-                                        
-                                        return count($variables) ?  implode(', ', $variables) : 'No variables available';
+
+                                        return count($variables) ? implode(', ', $variables) : 'No variables available';
                                     })
                                     ->helperText('You can use these variables in your email ')
                                     ->columnSpanFull(),
