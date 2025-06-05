@@ -24,7 +24,7 @@ class ContactForm extends Model
         'email_body',
         'success_message',
         'error_message',
-        'validation_error_message'
+        'validation_error_message',
     ];
 
     protected $casts = [

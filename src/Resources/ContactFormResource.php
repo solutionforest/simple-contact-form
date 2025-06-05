@@ -2,17 +2,12 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
-use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as FormAction;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -28,12 +23,11 @@ class ContactFormResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public function mount():void{
-       
-    }
+    public function mount(): void {}
+
     public static function form(Form $form): Form
-    {   
-        
+    {
+
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
@@ -56,20 +50,20 @@ class ContactFormResource extends Resource
                                     ->columnSpanFull()
                                     ->collapsed(true)
                                     ->collapsible(false)
-                                    ->itemLabel(fn (array $state): ?string => $state['string'] ?? null )
+                                    ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                     ->schema([
                                         Forms\Components\TextInput::make('name')
-                                                    ->label('Field name')
+                                            ->label('Field name')
                                                     // ->distinct()
-                                                    ->nullable()
-                                                    ->readOnly(),
-                            
-                                        ])
+                                            ->nullable()
+                                            ->readOnly(),
+
+                                    ])
                                     ->extraItemActions([
                                         FormAction::make('edit')
                                             ->label('Edit')
                                             ->icon('heroicon-o-pencil')
-                                            ->form(function (array $arguments,$livewire) {
+                                            ->form(function (array $arguments, $livewire) {
                                                 $content = $livewire->data['content'] ?? [];
                                                 $record = $content[$arguments['item']];
                                                 $type = $record['type'] ?? 'text';
@@ -83,7 +77,7 @@ class ContactFormResource extends Resource
 
                                                 return $formSchema;
                                             })
-                                             ->action(function (array $data, $livewire,$arguments)  {
+                                            ->action(function (array $data, $livewire, $arguments) {
                                                 $content = $livewire->data['content'] ?? [];
                                                 $record = $content[$arguments['item']];
                                                 $type = $record['type'] ?? 'text';
@@ -91,14 +85,13 @@ class ContactFormResource extends Resource
                                                 $content[$arguments['item']] = $newItem;
                                                 $livewire->data['content'] = $content;
                                                 // return ;
-                                            })
-                                           
-                                             
+                                            }),
+
                                     ])
                                     ->defaultItems(0)
                                     ->addable(false),
                             ]),
-                      
+
                         Tabs\Tab::make('Mail')
                             ->schema([
                                 // Forms\Components\Actions::make(self::getItemCopyActions()),
@@ -113,10 +106,11 @@ class ContactFormResource extends Resource
                                                 $variables[$key] = "{{{$key}}}";
                                             }
                                         }
+
                                         return $variables;
                                     })
                                     ->live()
-                                                                      
+
                                     ->extraAttributes([
                                         'x-data' => '{}',
                                         'x-init' => '
@@ -130,11 +124,11 @@ class ContactFormResource extends Resource
                                                         navigator.clipboard.writeText(text);
                                                 }
                                             });
-                                        '
+                                        ',
                                     ])
                                     ->inline()
                                     ->helperText('You can use these variables in your email '),
-                                
+
                                 Forms\Components\TextInput::make('email')
                                     // ->email()
                                     ->required()
@@ -154,7 +148,7 @@ class ContactFormResource extends Resource
                                     ->columnSpanFull()
                                     ->helperText('You can use the variables like : user name : {{name}}'),
                             ]),
-                        
+
                         Tabs\Tab::make('Messages')
                             ->schema([
                                 Forms\Components\TextInput::make('success_message')
@@ -173,21 +167,23 @@ class ContactFormResource extends Resource
                                     ->maxLength(255)
                                     ->helperText('Message to show after validation error'),
                             ]),
-                       
+
                     ])
-                    
+
                     ->columnSpanFull(),
 
             ]);
 
     }
-    public static function getItemCopyActions():array{
 
-        
+    public static function getItemCopyActions(): array
+    {
+
         return [
-           
+
         ];
     }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -263,12 +259,12 @@ class ContactFormResource extends Resource
                 ->form(self::getModalForm($actionType))
             // ->slideOver()
                 ->action(function (array $data, $livewire) use ($actionType) {
-                $content = $livewire->data['content'] ?? [];
-                $newItem = self::handleContentAdd($data, $actionType);
-                $content[] = $newItem;
-                $livewire->data['content'] = $content;
-                // return $newItem;
-            });
+                    $content = $livewire->data['content'] ?? [];
+                    $newItem = self::handleContentAdd($data, $actionType);
+                    $content[] = $newItem;
+                    $livewire->data['content'] = $content;
+                    // return $newItem;
+                });
         }
 
         return $actions;
@@ -351,55 +347,50 @@ class ContactFormResource extends Resource
         return $fields;
     }
 
-      
     public static function handleContentAdd($data, $actionType)
     {
-       
+
         // $content = $livewire->data['content'] ?? [];
-        
-      
+
         $newItem = [
             'label' => $data['label'] ?? '',
             'name' => $data['name'] ?? '',
             'type' => $actionType,
             'required' => $data['required'] ?? false,
         ];
-        
-        $string = '[ ' . $actionType . ' | '. ($data['label'] ?? '').' | '.($data['required'] ? 'required' : 'optional') ;
-       
+
+        $string = '[ ' . $actionType . ' | ' . ($data['label'] ?? '') . ' | ' . ($data['required'] ? 'required' : 'optional');
+
         if (isset($data['placeholder'])) {
             $newItem['placeholder'] = $data['placeholder'];
-            $string .=   ' | placeholder = [ ' .$data['placeholder'] .' ] ' ;
+            $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
-        
-       
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
-            $string .= ' | option =  [ ' . $optionsStr.' ] ' ;
+            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
+            $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
             if (isset($data['file_types'])) {
                 $newItem['file_types'] = $data['file_types'];
                 $typeStr = implode(' | ', $data['file_types']);
-                $string .= ' | accept =  [ '. $typeStr .' ]' ;
+                $string .= ' | accept =  [ ' . $typeStr . ' ]';
             }
             if (isset($data['max_size'])) {
                 $newItem['max_size'] = $data['max_size'];
-                $string .= ' | szie = '. $data['max_size'].' mb ]' ;
+                $string .= ' | szie = ' . $data['max_size'] . ' mb ]';
             }
         }
 
         $string .= ' ]';
-    
-    
+
         $newItem['string'] = $string;
-      
+
         // $content[] = $newItem;
-        
-       
+
         // $livewire->data['content'] = $content;
-       
+
         return $newItem;
     }
 }
