@@ -8,7 +8,6 @@ use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -23,12 +22,15 @@ class ContactFormResource extends Resource
     protected static ?string $model = ContactForm::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     public $record;
+
     public $data = [];
+
     public function mount(): void
     {
 
-        if (!$this->record?->exists) {
+        if (! $this->record?->exists) {
             $this->data['content'] = [
                 [
                     'id' => 1,
@@ -37,12 +39,12 @@ class ContactFormResource extends Resource
                 [
                     'id' => 2,
                     'items' => [],
-                ]
+                ],
             ];
         } else {
 
             $content = $this->record->content ?? [];
-            if (empty($content) || !isset($content[0]['id'])) {
+            if (empty($content) || ! isset($content[0]['id'])) {
                 $this->record->content = [
                     [
                         'id' => 1,
@@ -51,9 +53,8 @@ class ContactFormResource extends Resource
                     [
                         'id' => 2,
                         'items' => [],
-                    ]
+                    ],
                 ];
-
 
                 $this->data['content'] = $this->record->content;
             }
@@ -99,15 +100,16 @@ class ContactFormResource extends Resource
                                                 [
                                                     'id' => 2,
                                                     'items' => [],
-                                                ]
+                                                ],
                                             ]);
                                         } else {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (!isset($item['id'])) {
+                                                if (! isset($item['id'])) {
                                                     $needsUpdate = true;
+
                                                     break;
                                                 }
                                             }
@@ -125,8 +127,9 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (!isset($item['id'])) {
+                                            if (! isset($item['id'])) {
                                                 $needsUpdate = true;
+
                                                 break;
                                             }
                                         }
@@ -141,6 +144,7 @@ class ContactFormResource extends Resource
                                     })
                                     ->itemLabel(function (array $state) {
                                         $id = $state['id'] ?? null;
+
                                         return "Session {$id}";
                                     })
                                     ->maxItems(2)
@@ -152,7 +156,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -176,6 +180,7 @@ class ContactFormResource extends Resource
                                                                 $field->default($record[$fieldName]);
                                                             }
                                                         }
+
                                                         return $formSchema;
                                                     })
 
@@ -189,6 +194,7 @@ class ContactFormResource extends Resource
                                                             if (isset($section['items'][$itemIndex])) {
                                                                 $originalSection = $sectionIndex;
                                                                 $originalItem = $section['items'][$itemIndex];
+
                                                                 break;
                                                             }
                                                         }
@@ -207,11 +213,10 @@ class ContactFormResource extends Resource
                                                         }
 
                                                         $livewire->data['content'] = $content;
-                                                    })
-                                            ])
+                                                    }),
+                                            ]),
                                     ])
-                                    ->defaultItems(2)
-
+                                    ->defaultItems(2),
 
                             ]),
 
@@ -224,11 +229,10 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || !is_array($section['items'])) {
+                                            if (empty($section['items']) || ! is_array($section['items'])) {
                                                 continue;
                                             }
-                                            
-                                           
+
                                             foreach ($section['items'] as $field) {
                                                 if (isset($field['name'])) {
                                                     $key = \Illuminate\Support\Str::slug($field['name'], '_');
@@ -306,10 +310,10 @@ class ContactFormResource extends Resource
                     ->sortable(),
 
             ])->filters([
-                    //
-                ])->headerActions([
-                    // Tables\Actions\CreateAction::make(),
-                ])
+                //
+            ])->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 //
             ])
@@ -363,26 +367,22 @@ class ContactFormResource extends Resource
                     $content = $livewire->data['content'] ?? [];
                     $newItem = self::handleContentAdd($data, $actionType);
 
-
                     $sectionIndex = $data['section'] ?? 0;
 
-                    if (!isset($content[$sectionIndex])) {
+                    if (! isset($content[$sectionIndex])) {
                         $content[$sectionIndex] = [
                             'id' => $sectionIndex + 1,
-                            'items' => []
+                            'items' => [],
                         ];
                     }
 
-                    if (!isset($content[$sectionIndex]['items'])) {
+                    if (! isset($content[$sectionIndex]['items'])) {
                         $content[$sectionIndex]['items'] = [];
                     }
 
-
                     $content[$sectionIndex]['items'][] = $newItem;
 
-
                     $livewire->data['content'] = $content;
-
 
                 });
         }
@@ -404,7 +404,6 @@ class ContactFormResource extends Resource
                         $sessionId = $item['id'] ?? ($index + 1);
                         $options[$index] = "Session {$sessionId}";
                     }
-
 
                     if (empty($options)) {
                         $options['0'] = 'Session 1';
@@ -461,7 +460,7 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
@@ -514,9 +513,9 @@ class ContactFormResource extends Resource
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
