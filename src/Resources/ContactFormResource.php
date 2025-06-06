@@ -8,6 +8,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -22,8 +23,42 @@ class ContactFormResource extends Resource
     protected static ?string $model = ContactForm::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public $record;
+    public $data = [];
+    public function mount(): void
+    {
 
-    public function mount(): void {}
+        if (!$this->record?->exists) {
+            $this->data['content'] = [
+                [
+                    'id' => 1,
+                    'items' => [],
+                ],
+                [
+                    'id' => 2,
+                    'items' => [],
+                ]
+            ];
+        } else {
+
+            $content = $this->record->content ?? [];
+            if (empty($content) || !isset($content[0]['id'])) {
+                $this->record->content = [
+                    [
+                        'id' => 1,
+                        'items' => [],
+                    ],
+                    [
+                        'id' => 2,
+                        'items' => [],
+                    ]
+                ];
+
+
+                $this->data['content'] = $this->record->content;
+            }
+        }
+    }
 
     public static function form(Form $form): Form
     {
@@ -36,6 +71,7 @@ class ContactFormResource extends Resource
                     ->columnSpanFull(),
                 Tabs::make('Tabs')
                     ->tabs([
+
                         Tabs\Tab::make('Template')
                             ->schema([
                                 Forms\Components\Actions::make(self::getModelaction()),
@@ -46,50 +82,137 @@ class ContactFormResource extends Resource
                                                         [type | label | placeholder / options / [ accept | max_size ] ]'))
                                     ->columnSpanFull(),
                                 Repeater::make('content')
+                                    ->grid(2)
                                     ->label('Content')
-                                    ->columnSpanFull()
-                                    ->collapsed(true)
-                                    ->collapsible(false)
-                                    ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Field name')
-                                                    // ->distinct()
-                                            ->nullable()
-                                            ->readOnly(),
+                                    ->reorderable(false)
+                                    ->addable(false)
+                                    ->deletable(false)
+                                    ->live()
+                                    ->afterStateHydrated(function (Repeater $component, $state) {
 
-                                    ])
-                                    ->extraItemActions([
-                                        FormAction::make('edit')
-                                            ->label('Edit')
-                                            ->icon('heroicon-o-pencil')
-                                            ->form(function (array $arguments, $livewire) {
-                                                $content = $livewire->data['content'] ?? [];
-                                                $record = $content[$arguments['item']];
-                                                $type = $record['type'] ?? 'text';
-                                                $formSchema = self::getModalForm($type);
-                                                foreach ($formSchema as &$field) {
-                                                    $fieldName = $field->getName();
-                                                    if (isset($record[$fieldName])) {
-                                                        $field->default($record[$fieldName]);
-                                                    }
+                                        if (empty($state)) {
+                                            $component->state([
+                                                [
+                                                    'id' => 1,
+                                                    'items' => [],
+                                                ],
+                                                [
+                                                    'id' => 2,
+                                                    'items' => [],
+                                                ]
+                                            ]);
+                                        } else {
+                                            $needsUpdate = false;
+                                            $items = $state;
+
+                                            foreach ($items as $key => $item) {
+                                                if (!isset($item['id'])) {
+                                                    $needsUpdate = true;
+                                                    break;
                                                 }
+                                            }
+                                            if ($needsUpdate) {
+                                                $index = 1;
+                                                foreach ($items as $key => $item) {
+                                                    $items[$key]['id'] = $index;
+                                                    $index++;
+                                                }
+                                                $component->state($items);
+                                            }
+                                        }
+                                    })
+                                    ->afterStateUpdated(function (Repeater $component, $state, Forms\Get $get) {
+                                        $items = $get('content') ?? [];
+                                        $needsUpdate = false;
+                                        foreach ($items as $key => $item) {
+                                            if (!isset($item['id'])) {
+                                                $needsUpdate = true;
+                                                break;
+                                            }
+                                        }
+                                        if ($needsUpdate) {
+                                            $index = 1;
+                                            foreach ($items as $key => $item) {
+                                                $items[$key]['id'] = $index;
+                                                $index++;
+                                            }
+                                            $component->state($items);
+                                        }
+                                    })
+                                    ->itemLabel(function (array $state) {
+                                        $id = $state['id'] ?? null;
+                                        return "Session {$id}";
+                                    })
+                                    ->maxItems(2)
+                                    ->schema([
+                                        Repeater::make('items')
+                                            ->label(false)
+                                            ->defaultItems(0)
+                                            ->addable(false)
+                                            ->columnSpanFull()
+                                            ->collapsed(true)
+                                            ->collapsible(false)
+                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
+                                            ->extraItemActions([
+                                                FormAction::make('edit')
+                                                    ->label('Edit')
+                                                    ->icon('heroicon-o-pencil')
+                                                    ->form(function (array $arguments, $livewire, $state, Repeater $component) {
+                                                        $content = $livewire->data['content'] ?? [];
 
-                                                return $formSchema;
-                                            })
-                                            ->action(function (array $data, $livewire, $arguments) {
-                                                $content = $livewire->data['content'] ?? [];
-                                                $record = $content[$arguments['item']];
-                                                $type = $record['type'] ?? 'text';
-                                                $newItem = self::handleContentAdd($data, $type);
-                                                $content[$arguments['item']] = $newItem;
-                                                $livewire->data['content'] = $content;
-                                                // return ;
-                                            }),
+                                                        $items = $component->getState() ?? [];
 
+                                                        // dd($content,$items, $component->getItemState($arguments['item']));
+                                                        $itemKey = $arguments['item'] ?? null;
+                                                        $item = $items[$itemKey] ?? null;
+                                                        $record = $content[$item['section']]['items'][$itemKey];
+
+                                                        $type = $record['type'] ?? 'text';
+
+                                                        $formSchema = self::getModalForm($type, $content);
+                                                        foreach ($formSchema as &$field) {
+                                                            $fieldName = $field->getName();
+                                                            if (isset($record[$fieldName])) {
+                                                                $field->default($record[$fieldName]);
+                                                            }
+                                                        }
+                                                        return $formSchema;
+                                                    })
+
+                                                    ->action(function (array $data, $livewire, $arguments) {
+                                                        $content = $livewire->data['content'] ?? [];
+                                                        $itemIndex = $arguments['item'] ?? null;
+                                                        $originalSection = null;
+                                                        $originalItem = null;
+
+                                                        foreach ($content as $sectionIndex => $section) {
+                                                            if (isset($section['items'][$itemIndex])) {
+                                                                $originalSection = $sectionIndex;
+                                                                $originalItem = $section['items'][$itemIndex];
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if ($originalSection === null) {
+                                                            return;
+                                                        }
+
+                                                        $targetSection = $data['section'] ?? $originalSection;
+                                                        $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
+                                                        if ($originalSection != $targetSection) {
+                                                            unset($content[$originalSection]['items'][$itemIndex]);
+                                                            $content[$targetSection]['items'][$itemIndex] = $newItem;
+                                                        } else {
+                                                            $content[$targetSection]['items'][$itemIndex] = $newItem;
+                                                        }
+
+                                                        $livewire->data['content'] = $content;
+                                                    })
+                                            ])
                                     ])
-                                    ->defaultItems(0)
-                                    ->addable(false),
+                                    ->defaultItems(2)
+
+
                             ]),
 
                         Tabs\Tab::make('Mail')
@@ -100,14 +223,21 @@ class ContactFormResource extends Resource
                                     ->content(function (Forms\Get $get) {
                                         $content = $get('content') ?? [];
                                         $variables = [];
-                                        foreach ($content as $field) {
-                                            if (isset($field['name'])) {
-                                                $key = \Illuminate\Support\Str::slug($field['name'], '_');
-                                                $variables[] = "{{{$key}}}";
+                                        foreach ($content as $section) {
+                                            if (empty($section['items']) || !is_array($section['items'])) {
+                                                continue;
+                                            }
+                                            
+                                           
+                                            foreach ($section['items'] as $field) {
+                                                if (isset($field['name'])) {
+                                                    $key = \Illuminate\Support\Str::slug($field['name'], '_');
+                                                    $variables[] = "{{{$key}}}";
+                                                }
                                             }
                                         }
-                                        
-                                        return count($variables) ?  implode(', ', $variables) : 'No variables available';
+
+                                        return count($variables) ? implode(', ', $variables) : 'No variables available';
                                     })
                                     ->helperText('You can use these variables in your email ')
                                     ->columnSpanFull(),
@@ -149,7 +279,6 @@ class ContactFormResource extends Resource
                                     ->maxLength(255)
                                     ->helperText('Message to show after validation error'),
                             ]),
-
                     ])
 
                     ->columnSpanFull(),
@@ -175,23 +304,12 @@ class ContactFormResource extends Resource
                 Tables\Columns\TextColumn::make('subject')
                     ->searchable()
                     ->sortable(),
-                // Tables\Columns\TextColumn::make('content')
-                //     ->limit(50)
-                //     ->searchable(),
-                // Tables\Columns\TextColumn::make('from')
-                //     ->searchable()
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('to')
-                //     ->searchable()
-                //     ->sortable(),
-                // Tables\Columns\TextColumn::make('created_at')
-                //     ->dateTime()
-                //     ->sortable(),
+
             ])->filters([
-                //
-            ])->headerActions([
-                // Tables\Actions\CreateAction::make(),
-            ])
+                    //
+                ])->headerActions([
+                    // Tables\Actions\CreateAction::make(),
+                ])
             ->filters([
                 //
             ])
@@ -230,40 +348,95 @@ class ContactFormResource extends Resource
             $actions[$actionType] = FormAction::make($actionType)
                 ->label(ucfirst($actionType))
                 ->color('primary')
-                ->form(self::getModalForm($actionType))
-            // ->slideOver()
+                ->form(
+                    function (array $data, $livewire) use ($actionType) {
+
+                        $content = $livewire->data['content'] ?? [];
+
+                        // $sessionId = count($content) + 1; // Generate a new session ID
+                        return self::getModalForm($actionType, $content);
+                    }
+                )
+
+                // ->slideOver()
                 ->action(function (array $data, $livewire) use ($actionType) {
                     $content = $livewire->data['content'] ?? [];
                     $newItem = self::handleContentAdd($data, $actionType);
-                    $content[] = $newItem;
+
+
+                    $sectionIndex = $data['section'] ?? 0;
+
+                    if (!isset($content[$sectionIndex])) {
+                        $content[$sectionIndex] = [
+                            'id' => $sectionIndex + 1,
+                            'items' => []
+                        ];
+                    }
+
+                    if (!isset($content[$sectionIndex]['items'])) {
+                        $content[$sectionIndex]['items'] = [];
+                    }
+
+
+                    $content[$sectionIndex]['items'][] = $newItem;
+
+
                     $livewire->data['content'] = $content;
-                    // return $newItem;
+
+
                 });
         }
 
         return $actions;
     }
 
-    public static function getModalForm($actionType): array
+    public static function getModalForm($actionType, $content = null): array
     {
-        $fields = [
-            Forms\Components\TextInput::make('label')
-                ->label('Field Label')
-                ->required(),
-            Forms\Components\TextInput::make('name')
-                ->label('Field Name')
+
+        $fields = [];
+        if ($content) {
+            $fields[] = ToggleButtons::make('section')
+                ->label('Section')
                 ->required()
-                ->helperText('use for identification in the email body , no spaces or special characters')
-                ->live()
-                ->afterStateUpdated(function ($state, $set) {
-                    // Convert spaces and punctuation to underscores
-                    $sanitized = preg_replace('/[\s\p{P}]+/u', '_', $state);
-                    $set('name', $sanitized);
-                }),
-            Forms\Components\Toggle::make('required')
-                ->label('Required Field')
-                ->default(true),
-        ];
+                ->options(function (Forms\Get $get) use ($content): array {
+                    $options = [];
+                    foreach ($content as $index => $item) {
+                        $sessionId = $item['id'] ?? ($index + 1);
+                        $options[$index] = "Session {$sessionId}";
+                    }
+
+
+                    if (empty($options)) {
+                        $options['0'] = 'Session 1';
+                        $options['1'] = 'Session 2';
+                    }
+
+                    return $options;
+                })
+
+                ->default('0')
+                ->inline();
+
+            $fields[] = Forms\Components\Hidden::make('section_id');
+
+        }
+        $fields[] = Forms\Components\TextInput::make('label')
+            ->label('Field Label')
+            ->required();
+        $fields[] = Forms\Components\TextInput::make('name')
+            ->label('Field Name')
+            ->required()
+            ->helperText('use for identification in the email body , no spaces or special characters')
+            ->live()
+            ->afterStateUpdated(function ($state, $set) {
+                // Convert spaces and punctuation to underscores
+                $sanitized = preg_replace('/[\s\p{P}]+/u', '_', $state);
+                $set('name', $sanitized);
+            });
+        $fields[] = Forms\Components\Toggle::make('required')
+            ->label('Required Field')
+            ->default(true);
+
         if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox'])) {
             $fields[] = Repeater::make('options')
                 ->schema([
@@ -288,7 +461,7 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
+                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
@@ -327,6 +500,7 @@ class ContactFormResource extends Resource
         // $content = $livewire->data['content'] ?? [];
 
         $newItem = [
+            'section' => $data['section'] ?? null,
             'label' => $data['label'] ?? '',
             'name' => $data['name'] ?? '',
             'type' => $actionType,
@@ -340,9 +514,9 @@ class ContactFormResource extends Resource
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
