@@ -2,6 +2,7 @@
 
 namespace SolutionForest\SimpleContactForm\Livewire;
 
+use Exception;
 use Filament\Forms\Components;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -23,8 +24,14 @@ class ContactFormComponent extends Component implements HasForms
     public function mount($id): void
     {
         $this->formId = $id;
+        try {
         $this->contactForm = ContactForm::findOrFail($id);
         $this->form->fill();
+        } catch  (Exception $e) {
+            $this->contactForm = new ContactForm();
+            $this->addError('formError', 'Contact form not found.');
+        }
+       
     }
 
     public function form(Form $form): Form
