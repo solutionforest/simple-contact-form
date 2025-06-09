@@ -27,14 +27,15 @@ class ContactFormComponent extends Component implements HasForms
     public function mount($id): void
     {
         $this->formId = $id;
+
         try {
-        $this->contactForm = ContactForm::findOrFail($id);
-        $this->form->fill();
-        } catch  (Exception $e) {
-            $this->contactForm = new ContactForm();
+            $this->contactForm = ContactForm::findOrFail($id);
+            $this->form->fill();
+        } catch (Exception $e) {
+            $this->contactForm = new ContactForm;
             $this->addError('formError', 'Contact form not found.');
         }
-       
+
     }
 
     public function form(Form $form): Form
@@ -48,7 +49,7 @@ class ContactFormComponent extends Component implements HasForms
         //     }
         // }
         foreach ($this->contactForm->content ?? [] as $section) {
-            if(empty($section['items'])) {
+            if (empty($section['items'])) {
                 continue;
             }
             foreach ($section['items'] as $field) {
@@ -141,83 +142,69 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
-      
     public function create(): void
     {
-        
+
         $formData = $this->form->getState();
-        
-       
+
         $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
         $emailBody = $this->contactForm->email_body ?? '';
-       
-        
-       
+
         $replacedFrom = $this->replaceVariables($emailFrom, $formData);
         $replacedTo = $this->replaceVariables($emailTo, $formData);
         $replacedSubject = $this->replaceVariables($emailSubject, $formData);
         $replacedBody = $this->replaceVariables($emailBody, $formData);
-        
-    try {
 
-        // Mail::send([], [], function ($message) use ($replacedFrom, $replacedTo,  $replacedSubject, $replacedBody) {
-        //     $message->from($replacedFrom,)
-        //             ->to($replacedTo)
-        //             ->subject($replacedSubject)
-        //             ->setBody($replacedBody, 'text/html');
-        // });
-        
-        // dd('Email sent successfully');
-      
-        
-    } catch (\Exception $e) {
-        
-        \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
-        session()->flash('error', 'error');
+        try {
+
+            // Mail::send([], [], function ($message) use ($replacedFrom, $replacedTo,  $replacedSubject, $replacedBody) {
+            //     $message->from($replacedFrom,)
+            //             ->to($replacedTo)
+            //             ->subject($replacedSubject)
+            //             ->setBody($replacedBody, 'text/html');
+            // });
+
+            // dd('Email sent successfully');
+
+        } catch (\Exception $e) {
+
+            \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
+            session()->flash('error', 'error');
+        }
+
     }
-       
-         
-    }
-    
-    /**
-     * 
-     *
-     * @param string $text 
-     * @param array $data 
-     * @return string 
-     */
+
     private function replaceVariables(string $text, array $data): string
     {
-       
+
         preg_match_all('/\{\{([^}]+)\}\}/', $text, $matches);
-        
+
         if (empty($matches[1])) {
             return $text;
         }
-        
-       
+
         foreach ($matches[1] as $key => $varName) {
             $varName = trim($varName);
             $varValue = $data[$varName] ?? '';
             if (is_array($varValue) || is_object($varValue)) {
                 if (is_array($varValue)) {
-                    
+
                     if (isset($varValue['name'])) {
                         $varValue = $varValue['name'];
                     } else {
                         $varValue = implode(', ', $varValue);
                     }
                 } else {
-                    
+
                     $varValue = (string) $varValue;
                 }
             }
-            
+
             $text = str_replace($matches[0][$key], $varValue, $text);
         }
-        
+
         return $text;
     }
 
