@@ -8,6 +8,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
@@ -20,6 +21,8 @@ class ContactFormComponent extends Component implements HasForms
     public ?string $formId = null;
 
     public ContactForm $contactForm;
+
+    public ?array $email = null;
 
     public function mount($id): void
     {
@@ -37,11 +40,26 @@ class ContactFormComponent extends Component implements HasForms
     public function form(Form $form): Form
     {
         $schema = [];
-        foreach ($this->contactForm->content ?? [] as $field) {
-            $fieldType = $field['type'] ?? 'text';
-            $fieldSchema = $this->getFieldSchema($fieldType, $field);
-            if ($fieldSchema) {
-                $schema[] = $fieldSchema;
+        // foreach ($this->contactForm->content ?? [] as $field) {
+        //     $fieldType = $field['type'] ?? 'text';
+        //     $fieldSchema = $this->getFieldSchema($fieldType, $field);
+        //     if ($fieldSchema) {
+        //         $schema[] = $fieldSchema;
+        //     }
+        // }
+        foreach ($this->contactForm->content ?? [] as $section) {
+            if(empty($section['items'])) {
+                continue;
+            }
+            foreach ($section['items'] as $field) {
+                $fieldType = $field['type'] ?? 'text';
+                if (empty($fieldType)) {
+                    continue;
+                }
+                $fieldSchema = $this->getFieldSchema($fieldType, $field);
+                if ($fieldSchema) {
+                    $schema[] = $fieldSchema;
+                }
             }
         }
 
@@ -123,9 +141,84 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
+      
     public function create(): void
     {
-        dd($this->form->getState());
+        
+        $formData = $this->form->getState();
+        
+       
+        $emailFrom = $this->contactForm->from ?? config('mail.from.address');
+        $emailTo = $this->contactForm->to ?? '';
+        $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
+        $emailBody = $this->contactForm->email_body ?? '';
+       
+        
+       
+        $replacedFrom = $this->replaceVariables($emailFrom, $formData);
+        $replacedTo = $this->replaceVariables($emailTo, $formData);
+        $replacedSubject = $this->replaceVariables($emailSubject, $formData);
+        $replacedBody = $this->replaceVariables($emailBody, $formData);
+        
+    try {
+
+        // Mail::send([], [], function ($message) use ($replacedFrom, $replacedTo,  $replacedSubject, $replacedBody) {
+        //     $message->from($replacedFrom,)
+        //             ->to($replacedTo)
+        //             ->subject($replacedSubject)
+        //             ->setBody($replacedBody, 'text/html');
+        // });
+        
+        // dd('Email sent successfully');
+      
+        
+    } catch (\Exception $e) {
+        
+        \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
+        session()->flash('error', 'error');
+    }
+       
+         
+    }
+    
+    /**
+     * 
+     *
+     * @param string $text 
+     * @param array $data 
+     * @return string 
+     */
+    private function replaceVariables(string $text, array $data): string
+    {
+       
+        preg_match_all('/\{\{([^}]+)\}\}/', $text, $matches);
+        
+        if (empty($matches[1])) {
+            return $text;
+        }
+        
+       
+        foreach ($matches[1] as $key => $varName) {
+            $varName = trim($varName);
+            $varValue = $data[$varName] ?? '';
+            if (is_array($varValue) || is_object($varValue)) {
+                if (is_array($varValue)) {
+                    
+                    if (isset($varValue['name'])) {
+                        $varValue = $varValue['name'];
+                    } else {
+                        $varValue = implode(', ', $varValue);
+                    }
+                } else {
+                    
+                    $varValue = (string) $varValue;
+                }
+            }
+            
+            $text = str_replace($matches[0][$key], $varValue, $text);
+        }
+        
+        return $text;
     }
 
     public function submit()
