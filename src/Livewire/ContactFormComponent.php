@@ -4,17 +4,22 @@ namespace SolutionForest\SimpleContactForm\Livewire;
 
 use Exception;
 use Filament\Forms\Components;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Split;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class ContactFormComponent extends Component implements HasForms
 {
     use InteractsWithForms;
+    use WithFileUploads;
 
     public ?array $data = [];
 
@@ -44,17 +49,12 @@ class ContactFormComponent extends Component implements HasForms
     public function form(Form $form): Form
     {
         $schema = [];
-        // foreach ($this->contactForm->content ?? [] as $field) {
-        //     $fieldType = $field['type'] ?? 'text';
-        //     $fieldSchema = $this->getFieldSchema($fieldType, $field);
-        //     if ($fieldSchema) {
-        //         $schema[] = $fieldSchema;
-        //     }
-        // }
         foreach ($this->contactForm->content ?? [] as $section) {
             if (empty($section['items'])) {
                 continue;
             }
+
+            $sectionFields = [];
             foreach ($section['items'] as $field) {
                 $fieldType = $field['type'] ?? 'text';
                 if (empty($fieldType)) {
@@ -62,13 +62,37 @@ class ContactFormComponent extends Component implements HasForms
                 }
                 $fieldSchema = $this->getFieldSchema($fieldType, $field);
                 if ($fieldSchema) {
-                    $schema[] = $fieldSchema;
+                    $sectionFields[] = $fieldSchema;
                 }
             }
-        }
 
+            // Skip empty sections
+            if (empty($sectionFields)) {
+                continue;
+            }
+            $schema[]=Grid::make()
+                ->columns(1)
+                ->schema($sectionFields)
+                
+                ->columnSpanFull();
+        }
+      
+        // return $form
+        //     ->schema($schema)
+        //     ->statePath('data');
+        
         return $form
-            ->schema($schema)
+            ->schema(
+                [
+                    Split::make($schema)
+                        ->from('md')
+                        
+                        // ->schema($schema),
+                ]
+            )
+            ->extraAttributes(
+                $this->contactForm->extra_attributes ?? []
+            )
             ->statePath('data');
     }
 
@@ -78,19 +102,23 @@ class ContactFormComponent extends Component implements HasForms
         $label = $field['label'] ?? '';
         $required = $field['required'] ?? false;
         $placeholder = $field['placeholder'] ?? null;
+        $extraAttributes = $field['extra_attributes'] ?? [];
 
         switch (strtolower($type)) {
             case 'text':
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
+                 
 
             case 'email':
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->email()
                     ->placeholder($placeholder)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'tel':
@@ -98,49 +126,64 @@ class ContactFormComponent extends Component implements HasForms
                     ->label($label)
                     ->tel()
                     ->placeholder($placeholder)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'textarea':
                 return Components\Textarea::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'select':
                 return Components\Select::make($name)
                     ->label($label)
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'checkbox':
                 return Components\Checkbox::make($name)
                     ->label($label)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'radio':
                 return Components\Radio::make($name)
                     ->label($label)
+                    ->inline()
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'file':
-                $component = Components\FileUpload::make($name)
-                    ->label($label);
-
-                if (! empty($field['file_types'])) {
-                    $component->acceptedFileTypes(array_map(fn ($type) => ".$type", $field['file_types']));
-                }
-
-                if (! empty($field['max_size'])) {
-                    $component->maxSize($field['max_size'] * 1024);
-                }
-
-                return $component->required($required);
+                return Components\FileUpload::make($name)
+                    ->label($label)
+                    // ->acceptedFileTypes(
+                    //     !empty($field['file_types']) 
+                    //         ? array_map(fn($type) => ".$type", $field['file_types']) 
+                    //         : null
+                    // )
+                    // ->maxSize(
+                    //     !empty($field['max_size']) 
+                    //         ? ($field['max_size'] * 1024) 
+                    //         : null
+                    // )
+                    
+                    ->disk('public')
+                    ->visibility('public')
+                    ->directory('contact-uploads')
+                    ->preserveFilenames() 
+                    ->live()
+                    ->extraAttributes($extraAttributes)
+                    ->required($required);
 
             default:
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
+                    ->extraAttributes($extraAttributes)
                     ->required($required);
         }
     }
@@ -149,7 +192,7 @@ class ContactFormComponent extends Component implements HasForms
     {
 
         $formData = $this->form->getState();
-
+       
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
@@ -178,12 +221,25 @@ class ContactFormComponent extends Component implements HasForms
             });
 
             session()->flash('success', 'Your message has been sent successfully!');
+            
+            Notification::make()
+                ->title('Success')
+                ->body('Your message has been sent successfully!')
+                ->success()
+                ->send();
+            
             $this->form->fill(); // Reset form
 
         } catch (\Exception $e) {
             // Error handling
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
             session()->flash('error', 'Error sending email: ' . $e->getMessage());
+
+            Notification::make()
+                ->title('Error')
+                ->body('Error sending email: ' . $e->getMessage())
+                ->danger()
+                ->send();
         }
     }
 

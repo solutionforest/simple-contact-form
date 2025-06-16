@@ -20,10 +20,9 @@ return new class extends Migration
             $table->text('success_message');
             $table->text('error_message');
             $table->text('validation_error_message');
+            $table->text('extra_attributes');
             $table->timestamps();
-            
 
-            
         });
     }
 
