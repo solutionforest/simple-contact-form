@@ -2,7 +2,6 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
-use Dom\Text;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\MarkdownEditor;
@@ -32,7 +31,7 @@ class ContactFormResource extends Resource
     public function mount(): void
     {
 
-        if (!$this->record?->exists) {
+        if (! $this->record?->exists) {
             $this->data['content'] = [
                 [
                     'id' => 1,
@@ -46,7 +45,7 @@ class ContactFormResource extends Resource
         } else {
 
             $content = $this->record->content ?? [];
-            if (empty($content) || !isset($content[0]['id'])) {
+            if (empty($content) || ! isset($content[0]['id'])) {
                 $this->record->content = [
                     [
                         'id' => 1,
@@ -109,7 +108,7 @@ class ContactFormResource extends Resource
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (!isset($item['id'])) {
+                                                if (! isset($item['id'])) {
                                                     $needsUpdate = true;
 
                                                     break;
@@ -129,7 +128,7 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (!isset($item['id'])) {
+                                            if (! isset($item['id'])) {
                                                 $needsUpdate = true;
 
                                                 break;
@@ -158,7 +157,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -231,7 +230,7 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || !is_array($section['items'])) {
+                                            if (empty($section['items']) || ! is_array($section['items'])) {
                                                 continue;
                                             }
 
@@ -288,17 +287,17 @@ class ContactFormResource extends Resource
                         Tabs\Tab::make('extra_attuributes')
                             ->label('Extra Attributes')
                             ->schema([
-                               Textarea::make('extra_attributes')
+                                Textarea::make('extra_attributes')
                                     ->label('Extra Attributes')
                                     ->helperText('Optional extra attributes for the form, e.g., "data-custom=custom_value"')
                                     ->rows(2)
-                                    ->live()
-                                    // ->afterStateUpdated(function ($state, $set) {
-                                    //     // Process the extra attributes if needed
-                                    //     // For example, you can parse them into an array or validate them
-                                    //     $attributes = trim($state);
-                                    //     $set('extra_attributes', $attributes);
-                                    // })
+                                    ->live(),
+                                // ->afterStateUpdated(function ($state, $set) {
+                                //     // Process the extra attributes if needed
+                                //     // For example, you can parse them into an array or validate them
+                                //     $attributes = trim($state);
+                                //     $set('extra_attributes', $attributes);
+                                // })
                             ]),
                     ])
 
@@ -327,10 +326,10 @@ class ContactFormResource extends Resource
                     ->sortable(),
 
             ])->filters([
-                    //
-                ])->headerActions([
-                    // Tables\Actions\CreateAction::make(),
-                ])
+                //
+            ])->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 //
             ])
@@ -386,14 +385,14 @@ class ContactFormResource extends Resource
 
                     $sectionIndex = $data['section'] ?? 0;
 
-                    if (!isset($content[$sectionIndex])) {
+                    if (! isset($content[$sectionIndex])) {
                         $content[$sectionIndex] = [
                             'id' => $sectionIndex + 1,
                             'items' => [],
                         ];
                     }
 
-                    if (!isset($content[$sectionIndex]['items'])) {
+                    if (! isset($content[$sectionIndex]['items'])) {
                         $content[$sectionIndex]['items'] = [];
                     }
 
@@ -477,7 +476,7 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
@@ -519,7 +518,6 @@ class ContactFormResource extends Resource
         //     $set('extra_attributes', $attributes);
         // });
 
-
         return $fields;
     }
 
@@ -543,9 +541,9 @@ class ContactFormResource extends Resource
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
