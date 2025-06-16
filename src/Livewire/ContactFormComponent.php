@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
-
 class ContactFormComponent extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -24,7 +23,7 @@ class ContactFormComponent extends Component implements HasForms
     public ContactForm $contactForm;
 
     public ?array $email = null;
-    
+
     public ?string $customClass = null;
 
     public function mount($id, $customClass = null): void
@@ -42,7 +41,7 @@ class ContactFormComponent extends Component implements HasForms
 
     }
 
-      public function form(Form $form): Form
+    public function form(Form $form): Form
     {
         $schema = [];
         // foreach ($this->contactForm->content ?? [] as $field) {
@@ -128,11 +127,11 @@ class ContactFormComponent extends Component implements HasForms
                 $component = Components\FileUpload::make($name)
                     ->label($label);
 
-                if (!empty($field['file_types'])) {
-                    $component->acceptedFileTypes(array_map(fn($type) => ".$type", $field['file_types']));
+                if (! empty($field['file_types'])) {
+                    $component->acceptedFileTypes(array_map(fn ($type) => ".$type", $field['file_types']));
                 }
 
-                if (!empty($field['max_size'])) {
+                if (! empty($field['max_size'])) {
                     $component->maxSize($field['max_size'] * 1024);
                 }
 
@@ -146,25 +145,21 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
-
     public function create(): void
     {
 
         $formData = $this->form->getState();
 
-
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
         $emailBody = $this->contactForm->email_body ?? '';
-       
-
 
         // $replacedFrom = $this->replaceVariables($emailFrom, $formData);
         $replacedTo = $this->replaceVariables($emailTo, $formData);
         $replacedSubject = $this->replaceVariables($emailSubject, $formData);
         $replacedBody = $this->replaceVariables($emailBody, $formData);
-        
+
         try {
             Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody, $formData) {
                 $message->to($replacedTo)
@@ -182,8 +177,6 @@ class ContactFormComponent extends Component implements HasForms
 
             });
 
-
-            
             session()->flash('success', 'Your message has been sent successfully!');
             $this->form->fill(); // Reset form
 
@@ -235,7 +228,7 @@ class ContactFormComponent extends Component implements HasForms
     public function render(): View
     {
         return view('simple-contact-form::livewire.contact-form-component', [
-            'form' => $this->form
+            'form' => $this->form,
         ]);
     }
 }
