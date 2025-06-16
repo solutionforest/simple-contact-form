@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
+
 class ContactFormComponent extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -23,10 +24,13 @@ class ContactFormComponent extends Component implements HasForms
     public ContactForm $contactForm;
 
     public ?array $email = null;
+    
+    public ?string $customClass = null;
 
-    public function mount($id): void
+    public function mount($id, $customClass = null): void
     {
         $this->formId = $id;
+        $this->customClass = $customClass;
 
         try {
             $this->contactForm = ContactForm::findOrFail($id);
@@ -38,7 +42,7 @@ class ContactFormComponent extends Component implements HasForms
 
     }
 
-    public function form(Form $form): Form
+      public function form(Form $form): Form
     {
         $schema = [];
         // foreach ($this->contactForm->content ?? [] as $field) {
@@ -124,11 +128,11 @@ class ContactFormComponent extends Component implements HasForms
                 $component = Components\FileUpload::make($name)
                     ->label($label);
 
-                if (! empty($field['file_types'])) {
-                    $component->acceptedFileTypes(array_map(fn ($type) => ".$type", $field['file_types']));
+                if (!empty($field['file_types'])) {
+                    $component->acceptedFileTypes(array_map(fn($type) => ".$type", $field['file_types']));
                 }
 
-                if (! empty($field['max_size'])) {
+                if (!empty($field['max_size'])) {
                     $component->maxSize($field['max_size'] * 1024);
                 }
 
@@ -142,38 +146,52 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
+
     public function create(): void
     {
 
         $formData = $this->form->getState();
 
-        $emailFrom = $this->contactForm->from ?? config('mail.from.address');
+
+        // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
         $emailBody = $this->contactForm->email_body ?? '';
+       
 
-        $replacedFrom = $this->replaceVariables($emailFrom, $formData);
+
+        // $replacedFrom = $this->replaceVariables($emailFrom, $formData);
         $replacedTo = $this->replaceVariables($emailTo, $formData);
         $replacedSubject = $this->replaceVariables($emailSubject, $formData);
         $replacedBody = $this->replaceVariables($emailBody, $formData);
-
+        
         try {
+            Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody, $formData) {
+                $message->to($replacedTo)
+                    ->subject($replacedSubject)
+                    ->html($replacedBody);
+                // Handle attachments
+                foreach ($formData as $key => $value) {
+                    if (is_array($value) && isset($value['livewire'])) {
+                        $path = storage_path('app/livewire-tmp/' . $value['livewire']);
+                        if (file_exists($path)) {
+                            $message->attach($path);
+                        }
+                    }
+                }
 
-            // Mail::send([], [], function ($message) use ($replacedFrom, $replacedTo,  $replacedSubject, $replacedBody) {
-            //     $message->from($replacedFrom,)
-            //             ->to($replacedTo)
-            //             ->subject($replacedSubject)
-            //             ->setBody($replacedBody, 'text/html');
-            // });
+            });
 
-            // dd('Email sent successfully');
+
+            
+            session()->flash('success', 'Your message has been sent successfully!');
+            $this->form->fill(); // Reset form
 
         } catch (\Exception $e) {
-
+            // Error handling
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
-            session()->flash('error', 'error');
+            session()->flash('error', 'Error sending email: ' . $e->getMessage());
         }
-
     }
 
     private function replaceVariables(string $text, array $data): string
@@ -216,6 +234,8 @@ class ContactFormComponent extends Component implements HasForms
 
     public function render(): View
     {
-        return view('simple-contact-form::livewire.contact-form-component');
+        return view('simple-contact-form::livewire.contact-form-component', [
+            'form' => $this->form
+        ]);
     }
 }
