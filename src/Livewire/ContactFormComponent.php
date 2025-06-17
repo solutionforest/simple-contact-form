@@ -76,24 +76,19 @@ class ContactFormComponent extends Component implements HasForms
 
                 ->columnSpanFull();
         }
-        
+
         return $form
             ->schema(
                 [
                     Split::make($schema)
-                        ->from('md')
-                         ->extraAttributes(
-                
-                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-            )
-                        
-                        // ->schema($schema),
+                        ->from('md'),
+
+                    // ->schema($schema),
                 ]
             )
-            // ->extraAttributes(
-                
-            //     $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-            // )
+            ->extraAttributes(
+                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
+            )
             ->statePath('data');
     }
 
@@ -187,12 +182,12 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
         }
     }
-    
+
     /**
      * Convert extra_attributes from text format to array
      * Format example: "class"="form-control","data-id"="123"
-     * 
-     * @param mixed $attributes Text format attributes or array
+     *
+     * @param  mixed  $attributes  Text format attributes or array
      * @return array|null Converted attributes array, or null if conversion fails
      */
     private function formatExtraAttributes($attributes)
@@ -201,12 +196,12 @@ class ContactFormComponent extends Component implements HasForms
         if (is_array($attributes)) {
             return $attributes;
         }
-         
+
         // If empty, return null
         if (empty($attributes)) {
             return null;
         }
-        
+
         // If it's a string, try to parse it into an array
         if (is_string($attributes)) {
             try {
@@ -216,45 +211,43 @@ class ContactFormComponent extends Component implements HasForms
                     // dd($decoded);
                     return $decoded;
                 }
-                
+
                 // If not JSON, try to parse "key"="value","key"="value" format
                 $result = [];
                 $pattern = '/(?:"([^"]+)"|\'([^\']+)\')=(?:"([^"]*)"|\'([^\']*)\'|([^,]*))?(?:,|$)/';
-                
+
                 if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
                     foreach ($matches as $match) {
                         $key = $match[1] ?? $match[2] ?? '';
                         $value = $match[3] ?? $match[4] ?? $match[5] ?? '';
-                        
+
                         if ($key !== '') {
                             $result[$key] = $value;
                         }
                     }
-                    // dd($result);
                     return $result;
                 }
-                
+
                 // If the above pattern doesn't match, try a simpler pattern
                 $pattern = '/([^=,]+)=([^,]*)(?:,|$)/';
                 if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
                     foreach ($matches as $match) {
                         $key = trim($match[1], '"\'');
                         $value = trim($match[2], '"\'');
-                        
+
                         if ($key !== '') {
                             $result[$key] = $value;
                         }
                     }
-                    // dd($result);
                     return $result;
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::warning('Error parsing extra_attributes: ' . $e->getMessage(), [
-                    'attributes' => $attributes
+                    'attributes' => $attributes,
                 ]);
             }
         }
-        
+
         // If conversion fails, return null
         return null;
     }
@@ -312,9 +305,12 @@ class ContactFormComponent extends Component implements HasForms
         } catch (\Exception $e) {
             // Error handling
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
-           
-            session()->flash('message', 'Error sending email: ' . $e->getMessage());
-            session()->flash('message-type', 'error');
+
+            Notification::make()
+                ->title('Error')
+                ->body('Error sending email: ' . $e->getMessage())
+                ->danger()
+                ->send();
         }
     }
 
