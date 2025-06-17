@@ -31,36 +31,65 @@ class ContactFormResource extends Resource
 
     public function mount(): void
     {
-
         if (!$this->record?->exists) {
             $this->data['content'] = [
-                [
-                    'id' => 1,
+                \Illuminate\Support\Str::uuid()->toString() => [
+                    'id' => 0, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
-                [
-                    'id' => 2,
+                \Illuminate\Support\Str::uuid()->toString() => [
+                    'id' => 1, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
             ];
-        } else {
-
-            $content = $this->record->content ?? [];
-            if (empty($content) || !isset($content[0]['id'])) {
-                $this->record->content = [
-                    [
-                        'id' => 1,
-                        'items' => [],
-                    ],
-                    [
-                        'id' => 2,
-                        'items' => [],
-                    ],
-                ];
-
-                $this->data['content'] = $this->record->content;
-            }
         }
+        //  else {
+        //     $content = $this->record->content ?? [];
+            
+        //     // Check if content needs to be migrated to UUID format
+        //     $needsMigration = empty($content) || is_numeric(array_key_first($content) ?? '') || !isset(array_values($content)[0]['id']);
+        //     if ($needsMigration) {
+        //         $newContent = [];
+                
+        //         // Initialize with default structure if empty
+        //         if (empty($content)) {
+        //             $content = [
+        //                 [
+        //                     'id' => 0,
+        //                     'items' => [],
+        //                 ],
+        //                 [
+        //                     'id' => 1,
+        //                     'items' => [],
+        //                 ],
+        //             ];
+        //         }
+                
+        //         // Convert existing content to UUID structure
+        //         foreach ($content as $index => $section) {
+        //             $sectionId = $section['id'] ?? $index;
+        //             $sectionUuid = \Illuminate\Support\Str::uuid()->toString();
+                    
+        //             $newItems = [];
+        //             if (isset($section['items']) && is_array($section['items'])) {
+        //                 foreach ($section['items'] as $item) {
+        //                     $itemUuid = \Illuminate\Support\Str::uuid()->toString();
+        //                     $newItems[$itemUuid] = $item;
+        //                 }
+        //             }
+                    
+        //             $newContent[$sectionUuid] = [
+        //                 'id' => $sectionId,
+        //                 'items' => $newItems,
+        //             ];
+        //         }
+                
+        //         $this->record->content = $newContent;
+        //         $this->data['content'] = $newContent;
+        //     } else {
+        //         $this->data['content'] = $content;
+        //     }
+        // }
     }
 
     public static function form(Form $form): Form
@@ -92,31 +121,19 @@ class ContactFormResource extends Resource
                                     ->deletable(false)
                                     ->live()
                                     ->afterStateHydrated(function (Repeater $component, $state) {
-
-                                        if (empty($state)) {
-                                            $component->state([
-                                                [
-                                                    'id' => 1,
-                                                    'items' => [],
-                                                ],
-                                                [
-                                                    'id' => 2,
-                                                    'items' => [],
-                                                ],
-                                            ]);
-                                        } else {
+                                        if (!empty($state)) {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
                                                 if (!isset($item['id'])) {
                                                     $needsUpdate = true;
-
                                                     break;
                                                 }
                                             }
+
                                             if ($needsUpdate) {
-                                                $index = 1;
+                                                $index = 0;
                                                 foreach ($items as $key => $item) {
                                                     $items[$key]['id'] = $index;
                                                     $index++;
@@ -131,12 +148,11 @@ class ContactFormResource extends Resource
                                         foreach ($items as $key => $item) {
                                             if (!isset($item['id'])) {
                                                 $needsUpdate = true;
-
                                                 break;
                                             }
                                         }
                                         if ($needsUpdate) {
-                                            $index = 1;
+                                            $index = 0;
                                             foreach ($items as $key => $item) {
                                                 $items[$key]['id'] = $index;
                                                 $index++;
@@ -145,8 +161,7 @@ class ContactFormResource extends Resource
                                         }
                                     })
                                     ->itemLabel(function (array $state) {
-                                        $id = $state['id'] ?? null;
-
+                                        $id = ($state['id'] ?? '0') + 1;
                                         return "Session {$id}";
                                     })
                                     ->maxItems(2)
@@ -167,11 +182,23 @@ class ContactFormResource extends Resource
                                                         $content = $livewire->data['content'] ?? [];
 
                                                         $items = $component->getState() ?? [];
-
                                                         // dd($content,$items, $component->getItemState($arguments['item']));
                                                         $itemKey = $arguments['item'] ?? null;
                                                         $item = $items[$itemKey] ?? null;
-                                                        $record = $content[$item['section']]['items'][$itemKey];
+                                                        //  dd($itemKey, $item,$content,$arguments);
+                                                        // $record = $content[$item['section']]['items'][$itemKey];
+                                                        $record = null;
+                                                        foreach ($content as $sectionIndex => $section) {
+                                                            if (isset($section['items'][$itemKey])) {
+                                                                $record = $section['items'][$itemKey];
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if (!$record) {
+                                                            // Handle case when item is not found
+                                                            return []; // Or whatever default form you want to show
+                                                        }
 
                                                         $type = $record['type'] ?? 'text';
 
@@ -182,6 +209,7 @@ class ContactFormResource extends Resource
                                                                 $field->default($record[$fieldName]);
                                                             }
                                                         }
+
 
                                                         return $formSchema;
                                                     })
@@ -207,6 +235,7 @@ class ContactFormResource extends Resource
 
                                                         $targetSection = $data['section'] ?? $originalSection;
                                                         $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
+
                                                         if ($originalSection != $targetSection) {
                                                             unset($content[$originalSection]['items'][$itemIndex]);
                                                             $content[$targetSection]['items'][$itemIndex] = $newItem;
@@ -288,17 +317,17 @@ class ContactFormResource extends Resource
                         Tabs\Tab::make('extra_attuributes')
                             ->label('Extra Attributes')
                             ->schema([
-                               Textarea::make('extra_attributes')
+                                Textarea::make('extra_attributes')
                                     ->label('Extra Attributes')
                                     ->helperText('Optional extra attributes for the form, e.g., "data-custom=custom_value"')
                                     ->rows(2)
                                     ->live()
-                                    // ->afterStateUpdated(function ($state, $set) {
-                                    //     // Process the extra attributes if needed
-                                    //     // For example, you can parse them into an array or validate them
-                                    //     $attributes = trim($state);
-                                    //     $set('extra_attributes', $attributes);
-                                    // })
+                                // ->afterStateUpdated(function ($state, $set) {
+                                //     // Process the extra attributes if needed
+                                //     // For example, you can parse them into an array or validate them
+                                //     $attributes = trim($state);
+                                //     $set('extra_attributes', $attributes);
+                                // })
                             ]),
                     ])
 
@@ -371,36 +400,40 @@ class ContactFormResource extends Resource
                 ->color('primary')
                 ->form(
                     function (array $data, $livewire) use ($actionType) {
-
                         $content = $livewire->data['content'] ?? [];
-
-                        // $sessionId = count($content) + 1; // Generate a new session ID
                         return self::getModalForm($actionType, $content);
                     }
                 )
-
-                // ->slideOver()
                 ->action(function (array $data, $livewire) use ($actionType) {
                     $content = $livewire->data['content'] ?? [];
                     $newItem = self::handleContentAdd($data, $actionType);
-
-                    $sectionIndex = $data['section'] ?? 0;
-
-                    if (!isset($content[$sectionIndex])) {
-                        $content[$sectionIndex] = [
-                            'id' => $sectionIndex + 1,
-                            'items' => [],
+                    $sectionId = $data['section'] ?? 0; 
+    
+                    $sectionUuid = null;
+                    foreach ($content as $uuid => $section) {
+                        if (isset($section['id']) && $section['id'] == $sectionId) {
+                            $sectionUuid = $uuid;
+                            break;
+                        }
+                    }
+                    
+                    if ($sectionUuid === null) {
+                        $sectionUuid = \Illuminate\Support\Str::uuid()->toString();
+                        $content[$sectionUuid] = [
+                            'id' => $sectionId,
+                            'items' => []
                         ];
                     }
-
-                    if (!isset($content[$sectionIndex]['items'])) {
-                        $content[$sectionIndex]['items'] = [];
+                    
+                    if (!isset($content[$sectionUuid]['items'])) {
+                        $content[$sectionUuid]['items'] = [];
                     }
 
-                    $content[$sectionIndex]['items'][] = $newItem;
+                    $itemUuid = \Illuminate\Support\Str::uuid()->toString();
+                    $content[$sectionUuid]['items'][$itemUuid] = $newItem;
 
                     $livewire->data['content'] = $content;
-
+                  
                 });
         }
 
@@ -417,9 +450,9 @@ class ContactFormResource extends Resource
                 ->required()
                 ->options(function (Forms\Get $get) use ($content): array {
                     $options = [];
-                    foreach ($content as $index => $item) {
-                        $sessionId = $item['id'] ?? ($index + 1);
-                        $options[$index] = "Session {$sessionId}";
+                    foreach ($content as $uuid => $item) {
+                        $sessionId = $item['id'] + 1 ?? 1;
+                        $options[$item['id']] = "Session {$sessionId}";
                     }
 
                     if (empty($options)) {
@@ -429,13 +462,12 @@ class ContactFormResource extends Resource
 
                     return $options;
                 })
-
-                ->default('0')
+                ->default(0)
                 ->inline();
 
             $fields[] = Forms\Components\Hidden::make('section_id');
-
         }
+        
         $fields[] = Forms\Components\TextInput::make('label')
             ->label('Field Label')
             ->required();
@@ -534,10 +566,13 @@ class ContactFormResource extends Resource
             'name' => $data['name'] ?? '',
             'type' => $actionType,
             'required' => $data['required'] ?? false,
+            'extra_attributes' => $data['extra_attributes'] ?? '',
         ];
 
         $string = '[ ' . $actionType . ' | ' . ($data['label'] ?? '') . ' | ' . ($data['required'] ? 'required' : 'optional');
-
+        // if (isset($data['extra_attributes']) ) {
+        //     $newItem['extra_attributes'] = $data['extra_attributes'];
+        // }
         if (isset($data['placeholder'])) {
             $newItem['placeholder'] = $data['placeholder'];
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
@@ -567,7 +602,7 @@ class ContactFormResource extends Resource
         // $content[] = $newItem;
 
         // $livewire->data['content'] = $content;
-
+        // dd($newItem);
         return $newItem;
     }
 }

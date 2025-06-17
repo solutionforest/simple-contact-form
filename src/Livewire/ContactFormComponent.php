@@ -76,22 +76,20 @@ class ContactFormComponent extends Component implements HasForms
                 
                 ->columnSpanFull();
         }
-      
-        // return $form
-        //     ->schema($schema)
-        //     ->statePath('data');
         
         return $form
             ->schema(
                 [
                     Split::make($schema)
                         ->from('md')
+                       
                         
                         // ->schema($schema),
                 ]
             )
             ->extraAttributes(
-                $this->contactForm->extra_attributes ?? []
+                
+                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
             )
             ->statePath('data');
     }
@@ -102,7 +100,7 @@ class ContactFormComponent extends Component implements HasForms
         $label = $field['label'] ?? '';
         $required = $field['required'] ?? false;
         $placeholder = $field['placeholder'] ?? null;
-        $extraAttributes = $field['extra_attributes'] ?? [];
+        $extraAttributes = $this->formatExtraAttributes($field['extra_attributes'] ?? null) ?? [];
 
         switch (strtolower($type)) {
             case 'text':
@@ -187,6 +185,74 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
         }
     }
+    
+    /**
+     * Convert extra_attributes from text format to array
+     * Format example: "class"="form-control","data-id"="123"
+     * 
+     * @param mixed $attributes Text format attributes or array
+     * @return array|null Converted attributes array, or null if conversion fails
+     */
+    private function formatExtraAttributes($attributes)
+    {
+        // If already an array, return it
+        if (is_array($attributes)) {
+            return $attributes;
+        }
+         
+        // If empty, return null
+        if (empty($attributes)) {
+            return null;
+        }
+        
+        // If it's a string, try to parse it into an array
+        if (is_string($attributes)) {
+            try {
+                // First try to parse as JSON
+                $decoded = json_decode($attributes, true);
+                if (is_array($decoded)) {
+                    return $decoded;
+                }
+                
+                // If not JSON, try to parse "key"="value","key"="value" format
+                $result = [];
+                $pattern = '/(?:"([^"]+)"|\'([^\']+)\')=(?:"([^"]*)"|\'([^\']*)\'|([^,]*))?(?:,|$)/';
+                
+                if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
+                    foreach ($matches as $match) {
+                        $key = $match[1] ?? $match[2] ?? '';
+                        $value = $match[3] ?? $match[4] ?? $match[5] ?? '';
+                        
+                        if ($key !== '') {
+                            $result[$key] = $value;
+                        }
+                    }
+                    return $result;
+                }
+                
+                // If the above pattern doesn't match, try a simpler pattern
+                $pattern = '/([^=,]+)=([^,]*)(?:,|$)/';
+                if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
+                    foreach ($matches as $match) {
+                        $key = trim($match[1], '"\'');
+                        $value = trim($match[2], '"\'');
+                        
+                        if ($key !== '') {
+                            $result[$key] = $value;
+                        }
+                    }
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Error parsing extra_attributes: ' . $e->getMessage(), [
+                    'attributes' => $attributes
+                ]);
+            }
+        }
+        
+        // If conversion fails, return null
+        return null;
+    }
 
     public function create(): void
     {
@@ -220,7 +286,7 @@ class ContactFormComponent extends Component implements HasForms
 
             });
 
-            session()->flash('success', 'Your message has been sent successfully!');
+            
             
             Notification::make()
                 ->title('Success')
@@ -233,8 +299,7 @@ class ContactFormComponent extends Component implements HasForms
         } catch (\Exception $e) {
             // Error handling
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
-            session()->flash('error', 'Error sending email: ' . $e->getMessage());
-
+           
             Notification::make()
                 ->title('Error')
                 ->body('Error sending email: ' . $e->getMessage())
