@@ -2,7 +2,6 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
-use Dom\Text;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\MarkdownEditor;
@@ -126,7 +125,7 @@ class ContactFormResource extends Resource
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (!isset($item['id'])) {
+                                                if (! isset($item['id'])) {
                                                     $needsUpdate = true;
                                                     break;
                                                 }
@@ -146,7 +145,7 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (!isset($item['id'])) {
+                                            if (! isset($item['id'])) {
                                                 $needsUpdate = true;
                                                 break;
                                             }
@@ -173,7 +172,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -260,7 +259,7 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || !is_array($section['items'])) {
+                                            if (empty($section['items']) || ! is_array($section['items'])) {
                                                 continue;
                                             }
 
@@ -356,10 +355,10 @@ class ContactFormResource extends Resource
                     ->sortable(),
 
             ])->filters([
-                    //
-                ])->headerActions([
-                    // Tables\Actions\CreateAction::make(),
-                ])
+                //
+            ])->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 //
             ])
@@ -509,7 +508,7 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
+                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
@@ -551,7 +550,6 @@ class ContactFormResource extends Resource
         //     $set('extra_attributes', $attributes);
         // });
 
-
         return $fields;
     }
 
@@ -578,9 +576,9 @@ class ContactFormResource extends Resource
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {

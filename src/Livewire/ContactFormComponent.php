@@ -70,10 +70,10 @@ class ContactFormComponent extends Component implements HasForms
             if (empty($sectionFields)) {
                 continue;
             }
-            $schema[]=Grid::make()
+            $schema[] = Grid::make()
                 ->columns(1)
                 ->schema($sectionFields)
-                
+
                 ->columnSpanFull();
         }
         
@@ -109,7 +109,6 @@ class ContactFormComponent extends Component implements HasForms
                     ->placeholder($placeholder)
                     ->extraAttributes($extraAttributes)
                     ->required($required);
-                 
 
             case 'email':
                 return Components\TextInput::make($name)
@@ -159,20 +158,20 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     // ->acceptedFileTypes(
-                    //     !empty($field['file_types']) 
-                    //         ? array_map(fn($type) => ".$type", $field['file_types']) 
+                    //     !empty($field['file_types'])
+                    //         ? array_map(fn($type) => ".$type", $field['file_types'])
                     //         : null
                     // )
                     // ->maxSize(
-                    //     !empty($field['max_size']) 
-                    //         ? ($field['max_size'] * 1024) 
+                    //     !empty($field['max_size'])
+                    //         ? ($field['max_size'] * 1024)
                     //         : null
                     // )
-                    
+
                     ->disk('public')
                     ->visibility('public')
                     ->directory('contact-uploads')
-                    ->preserveFilenames() 
+                    ->preserveFilenames()
                     ->live()
                     ->extraAttributes($extraAttributes)
                     ->required($required);
@@ -258,7 +257,7 @@ class ContactFormComponent extends Component implements HasForms
     {
 
         $formData = $this->form->getState();
-       
+
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
@@ -293,7 +292,7 @@ class ContactFormComponent extends Component implements HasForms
                 ->body('Your message has been sent successfully!')
                 ->success()
                 ->send();
-            
+
             $this->form->fill(); // Reset form
 
         } catch (\Exception $e) {
