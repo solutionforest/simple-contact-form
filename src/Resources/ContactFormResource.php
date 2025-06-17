@@ -514,16 +514,16 @@ class ContactFormResource extends Resource
                 ->label('Allowed File Types')
                 ->multiple()
                 ->options([
-                    'jpg' => 'JPG',
-                    'jpeg' => 'JPEG',
-                    'png' => 'PNG',
-                    'pdf' => 'PDF',
-                    'doc' => 'DOC',
-                    'docx' => 'DOCX',
-                    'xls' => 'XLS',
-                    'xlsx' => 'XLSX',
-                    'txt' => 'TXT',
-                    'zip' => 'ZIP',
+                    'image/jpeg' => 'JPG',
+                    'image/jpeg' => 'JPEG',
+                    'image/png' => 'PNG',
+                    'application/pdf' => 'PDF',
+                    'application/msword' => 'DOC',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'DOCX',
+                    'application/vnd.ms-excel' => 'XLS',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
+                    'text/plain' => 'TXT',
+                    'application/zip' => 'ZIP',
                 ])
                 ->searchable()
                 ->helperText('Select allowed file types');

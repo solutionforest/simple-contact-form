@@ -1,5 +1,6 @@
-@import '../../vendor/filament/filament/dist/theme.css';
-@import '../../vendor/filament/filament/resources/css/index.css';
-@import '../../vendor/filament/filament/resources/css/base.css';
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants; */
 @import '../../vendor/filament/filament/resources/css/theme.css'; 
-@import '../../vendor/filament/filament/resources/css/app.css';
+

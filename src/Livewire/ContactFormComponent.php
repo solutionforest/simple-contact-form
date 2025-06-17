@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
-
+use function Filament\Notifications\notify;
 class ContactFormComponent extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -82,15 +82,18 @@ class ContactFormComponent extends Component implements HasForms
                 [
                     Split::make($schema)
                         ->from('md')
-                       
+                         ->extraAttributes(
+                
+                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
+            )
                         
                         // ->schema($schema),
                 ]
             )
-            ->extraAttributes(
+            // ->extraAttributes(
                 
-                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-            )
+            //     $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
+            // )
             ->statePath('data');
     }
 
@@ -101,7 +104,7 @@ class ContactFormComponent extends Component implements HasForms
         $required = $field['required'] ?? false;
         $placeholder = $field['placeholder'] ?? null;
         $extraAttributes = $this->formatExtraAttributes($field['extra_attributes'] ?? null) ?? [];
-
+       
         switch (strtolower($type)) {
             case 'text':
                 return Components\TextInput::make($name)
@@ -157,17 +160,17 @@ class ContactFormComponent extends Component implements HasForms
             case 'file':
                 return Components\FileUpload::make($name)
                     ->label($label)
-                    // ->acceptedFileTypes(
-                    //     !empty($field['file_types'])
-                    //         ? array_map(fn($type) => ".$type", $field['file_types'])
-                    //         : null
-                    // )
-                    // ->maxSize(
-                    //     !empty($field['max_size'])
-                    //         ? ($field['max_size'] * 1024)
-                    //         : null
-                    // )
-
+                    ->acceptedFileTypes(
+                        !empty($field['file_types'])
+                            ? $field['file_types']
+                            : null
+                          
+                    )
+                    ->maxSize(
+                        !empty($field['max_size'])
+                            ? ($field['max_size'] * 1024)
+                            : null
+                    )
                     ->disk('public')
                     ->visibility('public')
                     ->directory('contact-uploads')
@@ -210,6 +213,7 @@ class ContactFormComponent extends Component implements HasForms
                 // First try to parse as JSON
                 $decoded = json_decode($attributes, true);
                 if (is_array($decoded)) {
+                    // dd($decoded);
                     return $decoded;
                 }
                 
@@ -226,6 +230,7 @@ class ContactFormComponent extends Component implements HasForms
                             $result[$key] = $value;
                         }
                     }
+                    // dd($result);
                     return $result;
                 }
                 
@@ -240,6 +245,7 @@ class ContactFormComponent extends Component implements HasForms
                             $result[$key] = $value;
                         }
                     }
+                    // dd($result);
                     return $result;
                 }
             } catch (\Exception $e) {
@@ -257,7 +263,7 @@ class ContactFormComponent extends Component implements HasForms
     {
 
         $formData = $this->form->getState();
-
+        
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
@@ -275,21 +281,29 @@ class ContactFormComponent extends Component implements HasForms
                     ->html($replacedBody);
                 // Handle attachments
                 foreach ($formData as $key => $value) {
+                    
                     if (is_array($value) && isset($value['livewire'])) {
                         $path = storage_path('app/livewire-tmp/' . $value['livewire']);
                         if (file_exists($path)) {
-                            $message->attach($path);
+                            $originalName = $value['name'] ?? basename($path);
+                            $message->attach($path, ['as' => $originalName]);
+                        }
+                    }
+                   
+                    elseif (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
+                        $path = storage_path('app/public/' . $value);
+                        if (file_exists($path)) {
+                            $originalName = basename($value);
+                            $message->attach($path, ['as' => $originalName]);
                         }
                     }
                 }
 
             });
-
             
-            
-            Notification::make()
-                ->title('Success')
-                ->body('Your message has been sent successfully!')
+           Notification::make()
+                ->title('Contact Form Submitted')
+                ->body('Your contact form has been successfully submitted.')
                 ->success()
                 ->send();
 
@@ -299,11 +313,8 @@ class ContactFormComponent extends Component implements HasForms
             // Error handling
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
            
-            Notification::make()
-                ->title('Error')
-                ->body('Error sending email: ' . $e->getMessage())
-                ->danger()
-                ->send();
+            session()->flash('message', 'Error sending email: ' . $e->getMessage());
+            session()->flash('message-type', 'error');
         }
     }
 
