@@ -1,5 +1,5 @@
-<div class="simple-contact-form ">
-    {{-- Include the notification component --}}
+<div class="w-full max-w-2xl mx-auto">
+   @livewire('notifications')
     <form wire:submit="create" class="space-y-4">
         <div class="form-container">
             {{ $this->form }}
@@ -11,8 +11,10 @@
             </button>
         </div>
     </form>
-
+      @filamentStyles
+      @filamentScripts
     <style>
+        
         /* Custom styling to override Filament defaults */
         /* .simple-contact-form .fi-form {
           
