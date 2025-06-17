@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
-use function Filament\Notifications\notify;
+
 class ContactFormComponent extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -99,7 +99,7 @@ class ContactFormComponent extends Component implements HasForms
         $required = $field['required'] ?? false;
         $placeholder = $field['placeholder'] ?? null;
         $extraAttributes = $this->formatExtraAttributes($field['extra_attributes'] ?? null) ?? [];
-       
+
         switch (strtolower($type)) {
             case 'text':
                 return Components\TextInput::make($name)
@@ -156,13 +156,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        !empty($field['file_types'])
+                        ! empty($field['file_types'])
                             ? $field['file_types']
                             : null
-                          
                     )
                     ->maxSize(
-                        !empty($field['max_size'])
+                        ! empty($field['max_size'])
                             ? ($field['max_size'] * 1024)
                             : null
                     )
@@ -225,6 +224,7 @@ class ContactFormComponent extends Component implements HasForms
                             $result[$key] = $value;
                         }
                     }
+
                     return $result;
                 }
 
@@ -239,6 +239,7 @@ class ContactFormComponent extends Component implements HasForms
                             $result[$key] = $value;
                         }
                     }
+
                     return $result;
                 }
             } catch (\Exception $e) {
@@ -256,7 +257,7 @@ class ContactFormComponent extends Component implements HasForms
     {
 
         $formData = $this->form->getState();
-        
+
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
         $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
@@ -274,16 +275,14 @@ class ContactFormComponent extends Component implements HasForms
                     ->html($replacedBody);
                 // Handle attachments
                 foreach ($formData as $key => $value) {
-                    
+
                     if (is_array($value) && isset($value['livewire'])) {
                         $path = storage_path('app/livewire-tmp/' . $value['livewire']);
                         if (file_exists($path)) {
                             $originalName = $value['name'] ?? basename($path);
                             $message->attach($path, ['as' => $originalName]);
                         }
-                    }
-                   
-                    elseif (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
+                    } elseif (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
                         $path = storage_path('app/public/' . $value);
                         if (file_exists($path)) {
                             $originalName = basename($value);
@@ -293,8 +292,8 @@ class ContactFormComponent extends Component implements HasForms
                 }
 
             });
-            
-           Notification::make()
+
+            Notification::make()
                 ->title('Contact Form Submitted')
                 ->body('Your contact form has been successfully submitted.')
                 ->success()
