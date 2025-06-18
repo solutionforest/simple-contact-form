@@ -36,7 +36,7 @@ class ContactFormComponent extends Component implements HasForms
     public function mount($id, $customClass = null): void
     {
         $this->formId = $id;
-        $this->customClass = $customClass;
+
 
         try {
             $this->contactForm = ContactForm::findOrFail($id);
@@ -45,7 +45,8 @@ class ContactFormComponent extends Component implements HasForms
             $this->contactForm = new ContactForm;
             $this->addError('formError', 'Contact form not found.');
         }
-
+        
+        $this->customClass = $this->contactForm->extra_attributes ?? $customClass;
     }
 
     public function form(Form $form): Form
@@ -84,13 +85,13 @@ class ContactFormComponent extends Component implements HasForms
                 [
                     Split::make($schema)
                         ->from('md')
-                        ->extraAttributes(
-                            $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-                        ),
+
                     // ->schema($schema),
                 ]
             )
-
+            // ->extraAttributes(
+            //     $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
+            // )
             ->statePath('data');
     }
 
@@ -158,12 +159,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        ! empty($field['file_types'])
+                        !empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        ! empty($field['max_size'])
+                        !empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )
@@ -300,8 +301,8 @@ class ContactFormComponent extends Component implements HasForms
             });
 
             Notification::make()
-                ->title('Contact Form Submitted')
-                ->body('Your contact form has been successfully submitted.')
+                ->title($this->contactForm->success_message ?? 'Success')
+                // ->body('Your contact form has been successfully submitted.')
                 ->success()
                 ->send();
 
@@ -312,7 +313,7 @@ class ContactFormComponent extends Component implements HasForms
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
 
             Notification::make()
-                ->title('Error')
+                ->title($this->contactForm->error_message ?? 'Error')
                 ->body('Error sending email: ' . $e->getMessage())
                 ->danger()
                 ->send();
