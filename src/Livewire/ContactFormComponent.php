@@ -45,7 +45,39 @@ class ContactFormComponent extends Component implements HasForms
             $this->addError('formError', 'Contact form not found.');
         }
 
-        $this->customClass = $this->contactForm->extra_attributes ?? $customClass;
+
+        if ($this->contactForm->extra_attributes) {
+
+            $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
+            // dd($this->customClass );
+        } else {
+            $this->customClass = $customClass;
+        }
+    }
+
+    private function formatAttributesForHtml(?string $attributesText): string
+    {
+        if (empty($attributesText)) {
+            return '';
+        }
+        $result = [];
+        $pattern = '/(?:"([^"]+)"|\'([^\']+)\')=(?:"([^"]*)"|\'([^\']*)\'|([^,]*))?(?:,|$)/';
+
+        if (preg_match_all($pattern, $attributesText, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $key = $match[1] ?? $match[2] ?? '';
+                $value = $match[3] ?? $match[4] ?? $match[5] ?? '';
+
+                if ($key !== '') {
+
+                    $value = trim($value, '"\'');
+
+
+                    $result[] = $key . '="' . htmlspecialchars($value) . '"';
+                }
+            }
+        }
+        return implode(' ', $result);
     }
 
     public function form(Form $form): Form
@@ -100,70 +132,74 @@ class ContactFormComponent extends Component implements HasForms
         $label = $field['label'] ?? '';
         $required = $field['required'] ?? false;
         $placeholder = $field['placeholder'] ?? null;
-        $extraAttributes = $this->formatExtraAttributes($field['extra_attributes'] ?? null) ?? [];
+        // $extraAttributes = $this->formatExtraAttributes($field['extra_attributes'] ?? null) ?? [];
 
         switch (strtolower($type)) {
             case 'text':
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->extraAttributes($extraAttributes)
+                    ->email($field['email'] ?? false)
+                    ->tel($field['tel'] ?? false)
+                    ->numeric($field['number'] ?? false)
+                    // ->extraAttributes($extraAttributes)
                     ->required($required);
 
-            case 'email':
-                return Components\TextInput::make($name)
-                    ->label($label)
-                    ->email()
-                    ->placeholder($placeholder)
-                    ->extraAttributes($extraAttributes)
-                    ->required($required);
+            // case 'email':
+            //     return Components\TextInput::make($name)
+            //         ->label($label)
+            //         ->email()
+            //         ->placeholder($placeholder)
+            //         // ->extraAttributes($extraAttributes)
+            //         ->required($required);
 
-            case 'tel':
-                return Components\TextInput::make($name)
-                    ->label($label)
-                    ->tel()
-                    ->placeholder($placeholder)
-                    ->extraAttributes($extraAttributes)
-                    ->required($required);
+            // case 'tel':
+            //     return Components\TextInput::make($name)
+            //         ->label($label)
+            //         ->tel()
+            //         ->placeholder($placeholder)
+            //         // ->extraAttributes($extraAttributes)
+            //         ->required($required);
 
             case 'textarea':
                 return Components\Textarea::make($name)
                     ->label($label)
-                    ->placeholder($placeholder)
-                    ->extraAttributes($extraAttributes)
+                    // ->placeholder($placeholder)
+                    ->minLength($field['min_length'] ?? null)
+                    ->maxLength($field['max_length'] ?? null)
                     ->required($required);
 
             case 'select':
                 return Components\Select::make($name)
                     ->label($label)
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
-                    ->extraAttributes($extraAttributes)
+                    // ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'checkbox':
                 return Components\Checkbox::make($name)
                     ->label($label)
-                    ->extraAttributes($extraAttributes)
+                    // ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'radio':
                 return Components\Radio::make($name)
                     ->label($label)
-                    ->inline()
+                    // ->inline()
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
-                    ->extraAttributes($extraAttributes)
+                    // ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'file':
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        ! empty($field['file_types'])
+                        !empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        ! empty($field['max_size'])
+                        !empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )
@@ -172,14 +208,28 @@ class ContactFormComponent extends Component implements HasForms
                     ->directory('contact-uploads')
                     ->preserveFilenames()
                     ->live()
-                    ->extraAttributes($extraAttributes)
+                    // ->extraAttributes($extraAttributes)
+                    ->required($required);
+            case 'date':
+                $dateComponent = null;
+                if (!empty($field['include_time'])) {
+                    $dateComponent = Components\DateTimePicker::make($name);
+                } else {
+                    $dateComponent = Components\DatePicker::make($name);
+                }
+                return $dateComponent
+                    ->label($label)
+                    ->placeholder($placeholder)
+                    ->format(!empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
+                    ->minDate(!empty($field['min_date']) ? $field['min_date'] : null)
+                    ->maxDate(!empty($field['max_date']) ? $field['max_date'] : null)
                     ->required($required);
 
             default:
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->extraAttributes($extraAttributes)
+                    // ->extraAttributes($extraAttributes)
                     ->required($required);
         }
     }
@@ -206,17 +256,10 @@ class ContactFormComponent extends Component implements HasForms
         // If it's a string, try to parse it into an array
         if (is_string($attributes)) {
             try {
-                // First try to parse as JSON
-                $decoded = json_decode($attributes, true);
-                if (is_array($decoded)) {
-                    // dd($decoded);
-                    return $decoded;
-                }
 
                 // If not JSON, try to parse "key"="value","key"="value" format
                 $result = [];
                 $pattern = '/(?:"([^"]+)"|\'([^\']+)\')=(?:"([^"]*)"|\'([^\']*)\'|([^,]*))?(?:,|$)/';
-
                 if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
                     foreach ($matches as $match) {
                         $key = $match[1] ?? $match[2] ?? '';
@@ -229,7 +272,6 @@ class ContactFormComponent extends Component implements HasForms
 
                     return $result;
                 }
-
                 // If the above pattern doesn't match, try a simpler pattern
                 $pattern = '/([^=,]+)=([^,]*)(?:,|$)/';
                 if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {

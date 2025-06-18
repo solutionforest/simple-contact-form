@@ -1,17 +1,13 @@
-<div class="w-full max-w-2xl mx-auto">
+<div class="inline-block w-auto">
     @livewireStyles
     @filamentStyles
     @livewire('notifications')
-    <form wire:submit="create" {{ $this->customClass }} >
-        <div class="form-container">
+    <form wire:submit="create" {!! $this->customClass !!} >
+        <div >
             {{ $this->form }}
         </div>
 
         <div class="flex justify-end">
-            <!-- <button type="submit"
-                >
-                <span class="fi-btn-label">Submit</span>
-            </button> -->
             <x-filament::button type="submit" >
                 <span class="fi-btn-label">Submit</span>
             </x-filament::button>

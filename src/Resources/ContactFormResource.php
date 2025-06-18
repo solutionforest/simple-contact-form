@@ -30,7 +30,7 @@ class ContactFormResource extends Resource
 
     public function mount(): void
     {
-        if (! $this->record?->exists) {
+        if (!$this->record?->exists) {
             $this->data['content'] = [
                 \Illuminate\Support\Str::uuid()->toString() => [
                     'id' => 0, // Keep id for backward compatibility and UI display
@@ -120,12 +120,12 @@ class ContactFormResource extends Resource
                                     ->deletable(false)
                                     ->live()
                                     ->afterStateHydrated(function (Repeater $component, $state) {
-                                        if (! empty($state)) {
+                                        if (!empty($state)) {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (! isset($item['id'])) {
+                                                if (!isset($item['id'])) {
                                                     $needsUpdate = true;
 
                                                     break;
@@ -146,7 +146,7 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (! isset($item['id'])) {
+                                            if (!isset($item['id'])) {
                                                 $needsUpdate = true;
 
                                                 break;
@@ -175,7 +175,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -198,7 +198,7 @@ class ContactFormResource extends Resource
                                                             }
                                                         }
 
-                                                        if (! $record) {
+                                                        if (!$record) {
                                                             // Handle case when item is not found
                                                             return []; // Or whatever default form you want to show
                                                         }
@@ -235,14 +235,25 @@ class ContactFormResource extends Resource
                                                             return;
                                                         }
 
-                                                        $targetSection = $data['section'] ?? $originalSection;
+                                                        $targetSectionId = $data['section'] ?? null;
+                                                        $targetSection = $originalSection; 
+                                            
+                                                       
+                                                        if ($targetSectionId !== null) {
+                                                            foreach ($content as $uuid => $section) {
+                                                                if (isset($section['id']) && $section['id'] == $targetSectionId) {
+                                                                    $targetSection = $uuid;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
                                                         $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
 
                                                         if ($originalSection != $targetSection) {
                                                             unset($content[$originalSection]['items'][$itemIndex]);
                                                             $content[$targetSection]['items'][$itemIndex] = $newItem;
                                                         } else {
-                                                            $content[$targetSection]['items'][$itemIndex] = $newItem;
+                                                            $content[$originalSection]['items'][$itemIndex] = $newItem;
                                                         }
 
                                                         $livewire->data['content'] = $content;
@@ -262,7 +273,7 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || ! is_array($section['items'])) {
+                                            if (empty($section['items']) || !is_array($section['items'])) {
                                                 continue;
                                             }
 
@@ -278,16 +289,16 @@ class ContactFormResource extends Resource
                                     })
                                     ->helperText('You can use these variables in your email ')
                                     ->columnSpanFull(),
-                                Forms\Components\TextInput::make('email')
-                                    // ->email()
-                                    ->required()
-                                    ->maxLength(255),
+                                // Forms\Components\TextInput::make('email')
+                                //     // ->email()
+                                //     ->required()
+                                //     ->maxLength(255),
                                 Forms\Components\TextInput::make('subject')
                                     ->required()
                                     ->maxLength(255),
-                                Forms\Components\TextInput::make('from')
-                                    ->required()
-                                    ->maxLength(255),
+                                // Forms\Components\TextInput::make('from')
+                                //     ->required()
+                                //     ->maxLength(255),
                                 Forms\Components\TextInput::make('to')
                                     ->required()
                                     ->maxLength(255),
@@ -302,26 +313,26 @@ class ContactFormResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('success_message')
                                     ->label('Success message')
-                                    ->required()
+                                    // ->required()
                                     ->maxLength(255)
                                     ->helperText('Message to show after successful form submission'),
                                 Forms\Components\TextInput::make('error_message')
                                     ->label('Error message')
-                                    ->required()
+                                    // ->required()
                                     ->maxLength(255)
                                     ->helperText('Message to show after form submission error'),
-                                Forms\Components\TextInput::make('validation_error_message')
-                                    ->label('Validation error message')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->helperText('Message to show after validation error'),
+                                // Forms\Components\TextInput::make('validation_error_message')
+                                //     ->label('Validation error message')
+                                //     ->required()
+                                //     ->maxLength(255)
+                                //     ->helperText('Message to show after validation error'),
                             ]),
                         Tabs\Tab::make('extra_attuributes')
                             ->label('Extra Attributes')
                             ->schema([
                                 Textarea::make('extra_attributes')
                                     ->label('Extra Attributes')
-                                    ->helperText('Optional extra attributes for the form, e.g., "data-custom=custom_value"')
+                                    ->helperText('Optional extra attributes for the form, e.g., "class"="border border-dark rounded-xl m-w-2xl')
                                     ->rows(2)
                                     ->live(),
                                 // ->afterStateUpdated(function ($state, $set) {
@@ -350,18 +361,18 @@ class ContactFormResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('subject')
-                    ->searchable()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('email')
+                //     ->searchable()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('subject')
+                //     ->searchable()
+                //     ->sortable(),
 
             ])->filters([
-                //
-            ])->headerActions([
-                // Tables\Actions\CreateAction::make(),
-            ])
+                    //
+                ])->headerActions([
+                    // Tables\Actions\CreateAction::make(),
+                ])
             ->filters([
                 //
             ])
@@ -393,7 +404,7 @@ class ContactFormResource extends Resource
 
     public static function getModelaction(): array
     {
-        $actionsList = ['text', 'email', 'url', 'tel', 'number', 'date', 'textarea', 'select', 'checkbox', 'radio', 'file'];
+        $actionsList = ['text', 'date', 'textarea', 'select', 'radio', 'file', 'checkbox'];
         $actions = [];
 
         foreach ($actionsList as $actionType) {
@@ -420,7 +431,6 @@ class ContactFormResource extends Resource
                             break;
                         }
                     }
-
                     if ($sectionUuid === null) {
                         $sectionUuid = \Illuminate\Support\Str::uuid()->toString();
                         $content[$sectionUuid] = [
@@ -429,7 +439,7 @@ class ContactFormResource extends Resource
                         ];
                     }
 
-                    if (! isset($content[$sectionUuid]['items'])) {
+                    if (!isset($content[$sectionUuid]['items'])) {
                         $content[$sectionUuid]['items'] = [];
                     }
 
@@ -489,15 +499,15 @@ class ContactFormResource extends Resource
             ->label('Required Field')
             ->default(true);
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio'])) {
             $fields[] = Repeater::make('options')
                 ->schema([
                     Forms\Components\TextInput::make('label')
                         ->label('option label')
                         ->required()
                         ->maxLength(255)
-                        ->live()
-                        ->reactive()
+                        ->live(onBlur: true)
+                        // ->reactive()
                         ->afterStateUpdated(function ($state, $set) {
                             $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
                             $set('key', $generatedKey);
@@ -513,7 +523,7 @@ class ContactFormResource extends Resource
                 ->collapsed()
                 ->minItems(1)
                 ->maxItems(10)
-                ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
+                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
         } elseif (strtolower($actionType) === 'file') {
             $fields[] = Forms\Components\Select::make('file_types')
                 ->label('Allowed File Types')
@@ -533,21 +543,66 @@ class ContactFormResource extends Resource
                 ->searchable()
                 ->helperText('Select allowed file types');
             $fields[] = Forms\Components\TextInput::make('max_size')
-                ->label('Maximum File Size (MB)')
+                ->label('Maximum File Size ')
                 ->numeric()
                 ->default(5)
                 ->helperText('Maximum file size in megabytes');
+        } elseif (strtolower($actionType) === 'checkbox') {
+            $fields[] = Forms\Components\Toggle::make('inline')
+                ->label('Inline Options')
+                ->default(true);
+        } elseif (strtolower($actionType) === 'date') {
+            $fields[] = Forms\Components\Toggle::make('include_time')
+                ->label('Include Time')
+                ->default(false);
+            $fields[] = Forms\Components\Select::make('date_format')
+                ->label('Date Format')
+                ->options([
+                    'Y-m-d' => 'YYYY-MM-DD',
+                    'd/m/Y' => 'DD/MM/YYYY',
+                    'm/d/Y' => 'MM/DD/YYYY',
+                    'Y.m.d' => 'YYYY.MM.DD',
+                ])
+                ->default('Y-m-d');
+            $fields[] = Forms\Components\DatePicker::make('min_date')
+                ->label('Minimum Date')
+                // ->placeholder('YYYY-MM-DD')
+                ->helperText('Optional minimum selectable date');
+            $fields[] = Forms\Components\DatePicker::make('max_date')
+                ->label('Maximum Date')
+                // ->placeholder('YYYY-MM-DD')
+                ->helperText('Optional maximum selectable date');
+        } elseif (strtolower($actionType) === 'textarea') {
+            $fields[] = Forms\Components\TextInput::make('min_length')
+                ->label('Minimum Length')
+                ->numeric()
+                ->default(0)
+                ->helperText('Minimum number of characters required');
+            $fields[] = Forms\Components\TextInput::make('max_length')
+                ->label('Maximum Length')
+                ->numeric()
+                ->default(500)
+                ->helperText('Maximum number of characters allowed');
         } else {
+            $fields[] = Forms\Components\Toggle::make('email')
+                ->label('Email Field')
+                ->default(false);
+            $fields[] = Forms\Components\Toggle::make('phone')
+                ->label('Phone Field')
+                ->default(false);
+            $fields[] = Forms\Components\Toggle::make('number')
+                ->label('Number Field')
+                ->default(false);
             $fields[] = Forms\Components\TextInput::make('placeholder')
                 ->label('Placeholder Text')
                 ->helperText('Optional placeholder text for the field');
         }
 
-        $fields[] = Forms\Components\Textarea::make('extra_attributes')
-            ->label('Extra Attributes')
-            ->helperText('Optional extra attributes for the field, e.g., "data-custom=custom_value"')
-            ->rows(2)
-            ->live();
+        // $fields[] = Forms\Components\Textarea::make('extra_attributes')
+        //     ->label('Extra Attributes')
+        //     ->helperText('Optional extra attributes for the field, e.g., "data-custom=custom_value"')
+        //     ->rows(2)
+        //     ->live();
         // ->afterStateUpdated(function ($state, $set) {
         //     // Process the extra attributes if needed
         //     // For example, you can parse them into an array or validate them
@@ -569,7 +624,7 @@ class ContactFormResource extends Resource
             'name' => $data['name'] ?? '',
             'type' => $actionType,
             'required' => $data['required'] ?? false,
-            'extra_attributes' => $data['extra_attributes'] ?? '',
+            // 'extra_attributes' => $data['extra_attributes'] ?? '',
         ];
 
         $string = '[ ' . $actionType . ' | ' . ($data['label'] ?? '') . ' | ' . ($data['required'] ? 'required' : 'optional');
@@ -581,9 +636,9 @@ class ContactFormResource extends Resource
             $string .= ' | placeholder = [ ' . $data['placeholder'] . ' ] ';
         }
 
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
