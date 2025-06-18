@@ -7,6 +7,7 @@ use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\ToggleButtons;
@@ -291,7 +292,7 @@ class ContactFormResource extends Resource
                                 Forms\Components\TextInput::make('to')
                                     ->required()
                                     ->maxLength(255),
-                                MarkdownEditor::make('email_body')
+                                RichEditor::make('email_body')
                                     ->label('Email body')
                                     ->required()
                                     ->columnSpanFull()

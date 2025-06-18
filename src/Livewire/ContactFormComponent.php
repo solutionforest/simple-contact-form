@@ -30,7 +30,7 @@ class ContactFormComponent extends Component implements HasForms
     public ?array $email = null;
 
     public ?string $customClass = null;
-
+    public $referencedFields = [];
     public function mount($id, $customClass = null): void
     {
         $this->formId = $id;
@@ -81,14 +81,14 @@ class ContactFormComponent extends Component implements HasForms
             ->schema(
                 [
                     Split::make($schema)
-                        ->from('md'),
-
+                        ->from('md')
+                        ->extraAttributes(
+                            $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
+                        )
                     // ->schema($schema),
                 ]
             )
-            ->extraAttributes(
-                $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-            )
+
             ->statePath('data');
     }
 
@@ -156,14 +156,14 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        ! empty($field['file_types'])
-                            ? $field['file_types']
-                            : null
+                        !empty($field['file_types'])
+                        ? $field['file_types']
+                        : null
                     )
                     ->maxSize(
-                        ! empty($field['max_size'])
-                            ? ($field['max_size'] * 1024)
-                            : null
+                        !empty($field['max_size'])
+                        ? ($field['max_size'] * 1024)
+                        : null
                     )
                     ->disk('public')
                     ->visibility('public')
@@ -266,7 +266,7 @@ class ContactFormComponent extends Component implements HasForms
         // $replacedFrom = $this->replaceVariables($emailFrom, $formData);
         $replacedTo = $this->replaceVariables($emailTo, $formData);
         $replacedSubject = $this->replaceVariables($emailSubject, $formData);
-        $replacedBody = $this->replaceVariables($emailBody, $formData);
+        $replacedBody = $this->replaceVariables(str($emailBody)->sanitizeHtml(), $formData);
 
         try {
             Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody, $formData) {
@@ -274,19 +274,23 @@ class ContactFormComponent extends Component implements HasForms
                     ->subject($replacedSubject)
                     ->html($replacedBody);
                 // Handle attachments
+
                 foreach ($formData as $key => $value) {
 
-                    if (is_array($value) && isset($value['livewire'])) {
-                        $path = storage_path('app/livewire-tmp/' . $value['livewire']);
-                        if (file_exists($path)) {
-                            $originalName = $value['name'] ?? basename($path);
-                            $message->attach($path, ['as' => $originalName]);
-                        }
-                    } elseif (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
-                        $path = storage_path('app/public/' . $value);
-                        if (file_exists($path)) {
-                            $originalName = basename($value);
-                            $message->attach($path, ['as' => $originalName]);
+                    // if (is_array($value) && isset($value['livewire'])) {
+                    //     $path = storage_path('app/livewire-tmp/' . $value['livewire']);
+                    //     if (file_exists($path)) {
+                    //         $originalName = $value['name'] ?? basename($path);
+                    //         $message->attach($path, ['as' => $originalName]);
+                    //     }
+                    // } else
+                    if (in_array($key, $this->referencedFields)) {
+                        if (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
+                            $path = storage_path('app/public/' . $value);
+                            if (file_exists($path)) {
+                                $originalName = basename($value);
+                                $message->attach($path, ['as' => $originalName]);
+                            }
                         }
                     }
                 }
@@ -315,7 +319,7 @@ class ContactFormComponent extends Component implements HasForms
 
     private function replaceVariables(string $text, array $data): string
     {
-
+        $this->referencedFields = [];
         preg_match_all('/\{\{([^}]+)\}\}/', $text, $matches);
 
         if (empty($matches[1])) {
@@ -324,6 +328,7 @@ class ContactFormComponent extends Component implements HasForms
 
         foreach ($matches[1] as $key => $varName) {
             $varName = trim($varName);
+            $this->referencedFields[] = $varName;
             $varValue = $data[$varName] ?? '';
             if (is_array($varValue) || is_object($varValue)) {
                 if (is_array($varValue)) {
