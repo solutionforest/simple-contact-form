@@ -30,7 +30,9 @@ class ContactFormComponent extends Component implements HasForms
     public ?array $email = null;
 
     public ?string $customClass = null;
+
     public $referencedFields = [];
+
     public function mount($id, $customClass = null): void
     {
         $this->formId = $id;
@@ -84,7 +86,7 @@ class ContactFormComponent extends Component implements HasForms
                         ->from('md')
                         ->extraAttributes(
                             $this->formatExtraAttributes($this->contactForm->extra_attributes ?? null) ?? []
-                        )
+                        ),
                     // ->schema($schema),
                 ]
             )
@@ -156,12 +158,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        !empty($field['file_types'])
+                        ! empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        !empty($field['max_size'])
+                        ! empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )

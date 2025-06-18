@@ -4,7 +4,6 @@ namespace SolutionForest\SimpleContactForm\Resources;
 
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action as FormAction;
-use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
