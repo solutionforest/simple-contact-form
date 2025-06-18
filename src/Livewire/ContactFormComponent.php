@@ -45,7 +45,6 @@ class ContactFormComponent extends Component implements HasForms
             $this->addError('formError', 'Contact form not found.');
         }
 
-
         if ($this->contactForm->extra_attributes) {
 
             $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
@@ -72,11 +71,11 @@ class ContactFormComponent extends Component implements HasForms
 
                     $value = trim($value, '"\'');
 
-
                     $result[] = $key . '="' . htmlspecialchars($value) . '"';
                 }
             }
         }
+
         return implode(' ', $result);
     }
 
@@ -145,21 +144,21 @@ class ContactFormComponent extends Component implements HasForms
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
 
-            // case 'email':
-            //     return Components\TextInput::make($name)
-            //         ->label($label)
-            //         ->email()
-            //         ->placeholder($placeholder)
-            //         // ->extraAttributes($extraAttributes)
-            //         ->required($required);
+                // case 'email':
+                //     return Components\TextInput::make($name)
+                //         ->label($label)
+                //         ->email()
+                //         ->placeholder($placeholder)
+                //         // ->extraAttributes($extraAttributes)
+                //         ->required($required);
 
-            // case 'tel':
-            //     return Components\TextInput::make($name)
-            //         ->label($label)
-            //         ->tel()
-            //         ->placeholder($placeholder)
-            //         // ->extraAttributes($extraAttributes)
-            //         ->required($required);
+                // case 'tel':
+                //     return Components\TextInput::make($name)
+                //         ->label($label)
+                //         ->tel()
+                //         ->placeholder($placeholder)
+                //         // ->extraAttributes($extraAttributes)
+                //         ->required($required);
 
             case 'textarea':
                 return Components\Textarea::make($name)
@@ -194,12 +193,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        !empty($field['file_types'])
+                        ! empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        !empty($field['max_size'])
+                        ! empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )
@@ -212,17 +211,18 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
             case 'date':
                 $dateComponent = null;
-                if (!empty($field['include_time'])) {
+                if (! empty($field['include_time'])) {
                     $dateComponent = Components\DateTimePicker::make($name);
                 } else {
                     $dateComponent = Components\DatePicker::make($name);
                 }
+
                 return $dateComponent
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->format(!empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
-                    ->minDate(!empty($field['min_date']) ? $field['min_date'] : null)
-                    ->maxDate(!empty($field['max_date']) ? $field['max_date'] : null)
+                    ->format(! empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
+                    ->minDate(! empty($field['min_date']) ? $field['min_date'] : null)
+                    ->maxDate(! empty($field['max_date']) ? $field['max_date'] : null)
                     ->required($required);
 
             default:
