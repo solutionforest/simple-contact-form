@@ -37,7 +37,6 @@ class ContactFormComponent extends Component implements HasForms
     {
         $this->formId = $id;
 
-
         try {
             $this->contactForm = ContactForm::findOrFail($id);
             $this->form->fill();
@@ -45,7 +44,7 @@ class ContactFormComponent extends Component implements HasForms
             $this->contactForm = new ContactForm;
             $this->addError('formError', 'Contact form not found.');
         }
-        
+
         $this->customClass = $this->contactForm->extra_attributes ?? $customClass;
     }
 
@@ -84,7 +83,7 @@ class ContactFormComponent extends Component implements HasForms
             ->schema(
                 [
                     Split::make($schema)
-                        ->from('md')
+                        ->from('md'),
 
                     // ->schema($schema),
                 ]
@@ -159,12 +158,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        !empty($field['file_types'])
+                        ! empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        !empty($field['max_size'])
+                        ! empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )
