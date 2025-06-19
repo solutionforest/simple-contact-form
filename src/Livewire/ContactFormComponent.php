@@ -135,30 +135,15 @@ class ContactFormComponent extends Component implements HasForms
 
         switch (strtolower($type)) {
             case 'text':
+                
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
                     ->email($field['email'] ?? false)
-                    ->tel($field['tel'] ?? false)
+                    // ->tel($field['tel'] ?? false)
                     ->numeric($field['number'] ?? false)
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
-
-                // case 'email':
-                //     return Components\TextInput::make($name)
-                //         ->label($label)
-                //         ->email()
-                //         ->placeholder($placeholder)
-                //         // ->extraAttributes($extraAttributes)
-                //         ->required($required);
-
-                // case 'tel':
-                //     return Components\TextInput::make($name)
-                //         ->label($label)
-                //         ->tel()
-                //         ->placeholder($placeholder)
-                //         // ->extraAttributes($extraAttributes)
-                //         ->required($required);
 
             case 'textarea':
                 return Components\Textarea::make($name)
