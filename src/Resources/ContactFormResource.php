@@ -30,7 +30,7 @@ class ContactFormResource extends Resource
 
     public function mount(): void
     {
-        if (! $this->record?->exists) {
+        if (!$this->record?->exists) {
             $this->data['content'] = [
                 \Illuminate\Support\Str::uuid()->toString() => [
                     'id' => 0, // Keep id for backward compatibility and UI display
@@ -102,11 +102,9 @@ class ContactFormResource extends Resource
                     ->columnSpanFull(),
                 Tabs::make('Tabs')
                     ->tabs([
-
                         Tabs\Tab::make('Template')
                             ->schema([
                                 Forms\Components\Actions::make(self::getModelaction()),
-
                                 Placeholder::make('content_placeholder')
                                     ->label('Usage')
                                     ->content(new HtmlString('the item you add will display as following :
@@ -120,18 +118,17 @@ class ContactFormResource extends Resource
                                     ->deletable(false)
                                     ->live()
                                     ->afterStateHydrated(function (Repeater $component, $state) {
-                                        if (! empty($state)) {
+                                        if (!empty($state)) {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (! isset($item['id'])) {
+                                                if (!isset($item['id'])) {
                                                     $needsUpdate = true;
 
                                                     break;
                                                 }
                                             }
-
                                             if ($needsUpdate) {
                                                 $index = 0;
                                                 foreach ($items as $key => $item) {
@@ -146,7 +143,7 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (! isset($item['id'])) {
+                                            if (!isset($item['id'])) {
                                                 $needsUpdate = true;
 
                                                 break;
@@ -175,7 +172,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -198,7 +195,7 @@ class ContactFormResource extends Resource
                                                             }
                                                         }
 
-                                                        if (! $record) {
+                                                        if (!$record) {
                                                             // Handle case when item is not found
                                                             return []; // Or whatever default form you want to show
                                                         }
@@ -273,10 +270,9 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || ! is_array($section['items'])) {
+                                            if (empty($section['items']) || !is_array($section['items'])) {
                                                 continue;
                                             }
-
                                             foreach ($section['items'] as $field) {
                                                 if (isset($field['name'])) {
                                                     $key = \Illuminate\Support\Str::slug($field['name'], '_');
@@ -284,7 +280,6 @@ class ContactFormResource extends Resource
                                                 }
                                             }
                                         }
-
                                         return count($variables) ? implode(', ', $variables) : 'No variables available';
                                     })
                                     ->helperText('You can use these variables in your email ')
@@ -332,7 +327,7 @@ class ContactFormResource extends Resource
                             ->schema([
                                 Textarea::make('extra_attributes')
                                     ->label('Extra Attributes')
-                                    ->helperText('Optional extra attributes for the form, e.g., "class"="border border-dark rounded-xl m-w-2xl')
+                                    ->helperText('Optional extra attributes for the form, e.g., "class"="border border-dark rounded-xl m-w-2xl p-6"')
                                     ->rows(2)
                                     ->live(),
                                 // ->afterStateUpdated(function ($state, $set) {
@@ -369,10 +364,10 @@ class ContactFormResource extends Resource
                 //     ->sortable(),
 
             ])->filters([
-                //
-            ])->headerActions([
-                // Tables\Actions\CreateAction::make(),
-            ])
+                    //
+                ])->headerActions([
+                    // Tables\Actions\CreateAction::make(),
+                ])
             ->filters([
                 //
             ])
@@ -439,7 +434,7 @@ class ContactFormResource extends Resource
                         ];
                     }
 
-                    if (! isset($content[$sectionUuid]['items'])) {
+                    if (!isset($content[$sectionUuid]['items'])) {
                         $content[$sectionUuid]['items'] = [];
                     }
 
@@ -484,7 +479,16 @@ class ContactFormResource extends Resource
 
         $fields[] = Forms\Components\TextInput::make('label')
             ->label('Field Label')
-            ->required();
+            ->required()
+            ->live(onBlur: true)
+            ->afterStateUpdated(function ($state, $set ,$get) {
+                $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
+                $name = $get('name') ?? '';
+                if($name == '') {
+                    $set('name', $generatedKey);
+                }
+            })
+        ;
         $fields[] = Forms\Components\TextInput::make('name')
             ->label('Field Name')
             ->required()
@@ -524,7 +528,7 @@ class ContactFormResource extends Resource
                     ->collapsed()
                     ->minItems(1)
                     ->maxItems(10)
-                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
+                    ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
 
                 break;
             case 'file':
@@ -546,7 +550,7 @@ class ContactFormResource extends Resource
                     ->searchable()
                     ->helperText('Select allowed file types');
                 $fields[] = Forms\Components\TextInput::make('max_size')
-                    ->label('Maximum File Size ')
+                    ->label('Maximum File Size (mb) ')
                     ->numeric()
                     ->default(5)
                     ->helperText('Maximum file size in megabytes');
@@ -593,12 +597,59 @@ class ContactFormResource extends Resource
 
                 break;
             default:
-                $fields[] = Forms\Components\Toggle::make('email')
+                // $fields[] = Forms\Components\Toggle::make('email')
+                //     ->label('Email Field')
+                //     ->default(false);
+                // $fields[] = Forms\Components\Toggle::make('tel')
+                //     ->label('Phone Field')
+                //     ->default(false);
+                //     // ->helperText('Enable phone validation for this field');
+                // $fields[] = Forms\Components\Toggle::make('number')
+                //     ->label('Number Field')
+                //     ->default(false);
+
+                $fields[] = Forms\Components\ToggleButtons::make('validation_type')
+                    ->label('Validation Type')
+                    ->options([
+                        'none' => 'None',
+                        'email' => 'Email',
+                        'tel' => 'Phone',
+                        'number' => 'Number'
+                    ])
+                    ->inline()
+                    ->default('none')
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
+                        // Reset the validation fields if the type changes
+                        if ($state === 'none') {
+                            $set('email', false);
+                            $set('tel', false);
+                            $set('number', false);
+                        } elseif ($state === 'email') {
+                            $set('email', true);
+                            $set('tel', false);
+                            $set('number', false);
+                        } elseif ($state === 'tel') {
+                            $set('email', false);
+                            $set('tel', true);
+                            $set('number', false);
+                        } elseif ($state === 'number') {
+                            $set('email', false);
+                            $set('tel', false);
+                            $set('number', true);
+                        }
+                    });
+                $fields[] = Forms\Components\Hidden::make('email')
                     ->label('Email Field')
                     ->default(false);
-                $fields[] = Forms\Components\Toggle::make('number')
+                $fields[] = Forms\Components\Hidden::make('tel')
+                    ->label('Phone Field')
+                    ->default(false);
+                // ->helperText('Enable phone validation for this field');
+                $fields[] = Forms\Components\Hidden::make('number')
                     ->label('Number Field')
                     ->default(false);
+
                 $fields[] = Forms\Components\TextInput::make('placeholder')
                     ->label('Placeholder Text')
                     ->helperText('Optional placeholder text for the field');
@@ -647,20 +698,14 @@ class ContactFormResource extends Resource
             $newItem['email'] = $data['email'];
             $string .= ' | email validation';
         }
-
-        // 处理 phone 标志
-        if (isset($data['phone']) && $data['phone']) {
-            $newItem['phone'] = $data['phone'];
+        if (isset($data['tel']) && $data['tel']) {
+            $newItem['tel'] = $data['tel'];
             $string .= ' | phone validation';
         }
-
-        // 处理 number 标志
         if (isset($data['number']) && $data['number']) {
             $newItem['number'] = $data['number'];
             $string .= ' | number validation';
         }
-
-        // 处理 textarea 的长度限制
         if (isset($data['min_length'])) {
             $newItem['min_length'] = $data['min_length'];
             $string .= ' | min length = ' . $data['min_length'];
@@ -669,37 +714,33 @@ class ContactFormResource extends Resource
             $newItem['max_length'] = $data['max_length'];
             $string .= ' | max length = ' . $data['max_length'];
         }
-
-        // 处理 date 字段
         if (isset($data['include_time'])) {
             $newItem['include_time'] = $data['include_time'];
             $string .= ' | ' . ($data['include_time'] ? 'with time' : 'date only');
         }
-
         if (isset($data['date_format'])) {
             $newItem['date_format'] = $data['date_format'];
             $string .= ' | format = ' . $data['date_format'];
         }
-
         if (isset($data['min_date'])) {
             $newItem['min_date'] = $data['min_date'];
             $string .= ' | min date = ' . $data['min_date'];
         }
-
         if (isset($data['max_date'])) {
             $newItem['max_date'] = $data['max_date'];
             $string .= ' | max date = ' . $data['max_date'];
         }
-
-        // 处理 checkbox 的 inline 属性
         if (isset($data['inline'])) {
             $newItem['inline'] = $data['inline'];
             $string .= ' | ' . ($data['inline'] ? 'inline' : 'stacked');
         }
-
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
+        if (isset($data['validation_type']) && $data['validation_type'] !== 'none') {
+            $newItem['validation_type'] = $data['validation_type'];
+            // $string .= ' | validation = ' . $data['validation_type'];
+        }
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {
@@ -724,4 +765,5 @@ class ContactFormResource extends Resource
         // dd($newItem);
         return $newItem;
     }
+
 }

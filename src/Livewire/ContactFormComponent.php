@@ -53,6 +53,19 @@ class ContactFormComponent extends Component implements HasForms
             $this->customClass = $customClass;
         }
     }
+    public function hasFormContent(): bool
+    {
+        if (!$this->contactForm) {
+            return false;
+        }
+        $content = $this->contactForm->content ?? [];
+        foreach ($content as $section) {
+            if (!empty($section['items'])) {
+                return true; 
+            }
+        }
+        return false; 
+    }
 
     private function formatAttributesForHtml(?string $attributesText): string
     {
@@ -86,7 +99,6 @@ class ContactFormComponent extends Component implements HasForms
             if (empty($section['items'])) {
                 continue;
             }
-
             $sectionFields = [];
             foreach ($section['items'] as $field) {
                 $fieldType = $field['type'] ?? 'text';
@@ -98,7 +110,6 @@ class ContactFormComponent extends Component implements HasForms
                     $sectionFields[] = $fieldSchema;
                 }
             }
-
             // Skip empty sections
             if (empty($sectionFields)) {
                 continue;
@@ -109,7 +120,6 @@ class ContactFormComponent extends Component implements HasForms
 
                 ->columnSpanFull();
         }
-
         return $form
             ->schema(
                 [
@@ -140,7 +150,7 @@ class ContactFormComponent extends Component implements HasForms
                     ->label($label)
                     ->placeholder($placeholder)
                     ->email($field['email'] ?? false)
-                    // ->tel($field['tel'] ?? false)
+                    ->tel($field['tel'] ?? false)
                     ->numeric($field['number'] ?? false)
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
@@ -178,12 +188,12 @@ class ContactFormComponent extends Component implements HasForms
                 return Components\FileUpload::make($name)
                     ->label($label)
                     ->acceptedFileTypes(
-                        ! empty($field['file_types'])
+                        !empty($field['file_types'])
                         ? $field['file_types']
                         : null
                     )
                     ->maxSize(
-                        ! empty($field['max_size'])
+                        !empty($field['max_size'])
                         ? ($field['max_size'] * 1024)
                         : null
                     )
@@ -196,7 +206,7 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
             case 'date':
                 $dateComponent = null;
-                if (! empty($field['include_time'])) {
+                if (!empty($field['include_time'])) {
                     $dateComponent = Components\DateTimePicker::make($name);
                 } else {
                     $dateComponent = Components\DatePicker::make($name);
@@ -205,9 +215,9 @@ class ContactFormComponent extends Component implements HasForms
                 return $dateComponent
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->format(! empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
-                    ->minDate(! empty($field['min_date']) ? $field['min_date'] : null)
-                    ->maxDate(! empty($field['max_date']) ? $field['max_date'] : null)
+                    ->format(!empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
+                    ->minDate(!empty($field['min_date']) ? $field['min_date'] : null)
+                    ->maxDate(!empty($field['max_date']) ? $field['max_date'] : null)
                     ->required($required);
 
             default:
