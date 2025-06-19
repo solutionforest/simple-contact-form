@@ -30,7 +30,7 @@ class ContactFormResource extends Resource
 
     public function mount(): void
     {
-        if (!$this->record?->exists) {
+        if (! $this->record?->exists) {
             $this->data['content'] = [
                 \Illuminate\Support\Str::uuid()->toString() => [
                     'id' => 0, // Keep id for backward compatibility and UI display
@@ -120,12 +120,12 @@ class ContactFormResource extends Resource
                                     ->deletable(false)
                                     ->live()
                                     ->afterStateHydrated(function (Repeater $component, $state) {
-                                        if (!empty($state)) {
+                                        if (! empty($state)) {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (!isset($item['id'])) {
+                                                if (! isset($item['id'])) {
                                                     $needsUpdate = true;
 
                                                     break;
@@ -146,7 +146,7 @@ class ContactFormResource extends Resource
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
-                                            if (!isset($item['id'])) {
+                                            if (! isset($item['id'])) {
                                                 $needsUpdate = true;
 
                                                 break;
@@ -175,7 +175,7 @@ class ContactFormResource extends Resource
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
                                                     ->label('Edit')
@@ -198,7 +198,7 @@ class ContactFormResource extends Resource
                                                             }
                                                         }
 
-                                                        if (!$record) {
+                                                        if (! $record) {
                                                             // Handle case when item is not found
                                                             return []; // Or whatever default form you want to show
                                                         }
@@ -273,7 +273,7 @@ class ContactFormResource extends Resource
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
-                                            if (empty($section['items']) || !is_array($section['items'])) {
+                                            if (empty($section['items']) || ! is_array($section['items'])) {
                                                 continue;
                                             }
 
@@ -369,10 +369,10 @@ class ContactFormResource extends Resource
                 //     ->sortable(),
 
             ])->filters([
-                    //
-                ])->headerActions([
-                    // Tables\Actions\CreateAction::make(),
-                ])
+                //
+            ])->headerActions([
+                // Tables\Actions\CreateAction::make(),
+            ])
             ->filters([
                 //
             ])
@@ -439,7 +439,7 @@ class ContactFormResource extends Resource
                         ];
                     }
 
-                    if (!isset($content[$sectionUuid]['items'])) {
+                    if (! isset($content[$sectionUuid]['items'])) {
                         $content[$sectionUuid]['items'] = [];
                     }
 
@@ -502,102 +502,108 @@ class ContactFormResource extends Resource
         switch (strtolower($actionType)) {
             case 'select':
             case 'radio':
-            $fields[] = Repeater::make('options')
-                ->schema([
-                Forms\Components\TextInput::make('label')
-                    ->label('option label')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function ($state, $set) {
-                    $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
-                    $set('key', $generatedKey);
-                    }),
-                Forms\Components\TextInput::make('key')
-                    ->label('key')
-                    ->required()
-                    ->readOnly()
-                    ->maxLength(255),
-                ])
-                ->columns(2)
-                ->collapsible()
-                ->collapsed()
-                ->minItems(1)
-                ->maxItems(10)
-                ->itemLabel(fn(array $state): ?string => $state['label'] ?? null);
-            break;
+                $fields[] = Repeater::make('options')
+                    ->schema([
+                        Forms\Components\TextInput::make('label')
+                            ->label('option label')
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, $set) {
+                                $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
+                                $set('key', $generatedKey);
+                            }),
+                        Forms\Components\TextInput::make('key')
+                            ->label('key')
+                            ->required()
+                            ->readOnly()
+                            ->maxLength(255),
+                    ])
+                    ->columns(2)
+                    ->collapsible()
+                    ->collapsed()
+                    ->minItems(1)
+                    ->maxItems(10)
+                    ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
+
+                break;
             case 'file':
-            $fields[] = Forms\Components\Select::make('file_types')
-                ->label('Allowed File Types')
-                ->multiple()
-                ->options([
-                'image/jpeg' => 'JPG',
-                'image/jpeg' => 'JPEG',
-                'image/png' => 'PNG',
-                'application/pdf' => 'PDF',
-                'application/msword' => 'DOC',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'DOCX',
-                'application/vnd.ms-excel' => 'XLS',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
-                'text/plain' => 'TXT',
-                'application/zip' => 'ZIP',
-                ])
-                ->searchable()
-                ->helperText('Select allowed file types');
-            $fields[] = Forms\Components\TextInput::make('max_size')
-                ->label('Maximum File Size ')
-                ->numeric()
-                ->default(5)
-                ->helperText('Maximum file size in megabytes');
-            break;
+                $fields[] = Forms\Components\Select::make('file_types')
+                    ->label('Allowed File Types')
+                    ->multiple()
+                    ->options([
+                        'image/jpeg' => 'JPG',
+                        'image/jpeg' => 'JPEG',
+                        'image/png' => 'PNG',
+                        'application/pdf' => 'PDF',
+                        'application/msword' => 'DOC',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'DOCX',
+                        'application/vnd.ms-excel' => 'XLS',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
+                        'text/plain' => 'TXT',
+                        'application/zip' => 'ZIP',
+                    ])
+                    ->searchable()
+                    ->helperText('Select allowed file types');
+                $fields[] = Forms\Components\TextInput::make('max_size')
+                    ->label('Maximum File Size ')
+                    ->numeric()
+                    ->default(5)
+                    ->helperText('Maximum file size in megabytes');
+
+                break;
             case 'checkbox':
-            $fields[] = Forms\Components\Toggle::make('inline')
-                ->label('Inline Options')
-                ->default(true);
-            break;
+                $fields[] = Forms\Components\Toggle::make('inline')
+                    ->label('Inline Options')
+                    ->default(true);
+
+                break;
             case 'date':
-            $fields[] = Forms\Components\Toggle::make('include_time')
-                ->label('Include Time')
-                ->default(false);
-            $fields[] = Forms\Components\Select::make('date_format')
-                ->label('Date Format')
-                ->options([
-                'Y-m-d' => 'YYYY-MM-DD',
-                'd/m/Y' => 'DD/MM/YYYY',
-                'm/d/Y' => 'MM/DD/YYYY',
-                'Y.m.d' => 'YYYY.MM.DD',
-                ])
-                ->default('Y-m-d');
-            $fields[] = Forms\Components\DatePicker::make('min_date')
-                ->label('Minimum Date')
-                ->helperText('Optional minimum selectable date');
-            $fields[] = Forms\Components\DatePicker::make('max_date')
-                ->label('Maximum Date')
-                ->helperText('Optional maximum selectable date');
-            break;
+                $fields[] = Forms\Components\Toggle::make('include_time')
+                    ->label('Include Time')
+                    ->default(false);
+                $fields[] = Forms\Components\Select::make('date_format')
+                    ->label('Date Format')
+                    ->options([
+                        'Y-m-d' => 'YYYY-MM-DD',
+                        'd/m/Y' => 'DD/MM/YYYY',
+                        'm/d/Y' => 'MM/DD/YYYY',
+                        'Y.m.d' => 'YYYY.MM.DD',
+                    ])
+                    ->default('Y-m-d');
+                $fields[] = Forms\Components\DatePicker::make('min_date')
+                    ->label('Minimum Date')
+                    ->helperText('Optional minimum selectable date');
+                $fields[] = Forms\Components\DatePicker::make('max_date')
+                    ->label('Maximum Date')
+                    ->helperText('Optional maximum selectable date');
+
+                break;
             case 'textarea':
-            $fields[] = Forms\Components\TextInput::make('min_length')
-                ->label('Minimum Length')
-                ->numeric()
-                ->default(0)
-                ->helperText('Minimum number of characters required');
-            $fields[] = Forms\Components\TextInput::make('max_length')
-                ->label('Maximum Length')
-                ->numeric()
-                ->default(500)
-                ->helperText('Maximum number of characters allowed');
-            break;
+                $fields[] = Forms\Components\TextInput::make('min_length')
+                    ->label('Minimum Length')
+                    ->numeric()
+                    ->default(0)
+                    ->helperText('Minimum number of characters required');
+                $fields[] = Forms\Components\TextInput::make('max_length')
+                    ->label('Maximum Length')
+                    ->numeric()
+                    ->default(500)
+                    ->helperText('Maximum number of characters allowed');
+
+                break;
             default:
-            $fields[] = Forms\Components\Toggle::make('email')
-                ->label('Email Field')
-                ->default(false);
-            $fields[] = Forms\Components\Toggle::make('number')
-                ->label('Number Field')
-                ->default(false);
-            $fields[] = Forms\Components\TextInput::make('placeholder')
-                ->label('Placeholder Text')
-                ->helperText('Optional placeholder text for the field');
-            break;
+                $fields[] = Forms\Components\Toggle::make('email')
+                    ->label('Email Field')
+                    ->default(false);
+                $fields[] = Forms\Components\Toggle::make('number')
+                    ->label('Number Field')
+                    ->default(false);
+                $fields[] = Forms\Components\TextInput::make('placeholder')
+                    ->label('Placeholder Text')
+                    ->helperText('Optional placeholder text for the field');
+
+                break;
         }
 
         // $fields[] = Forms\Components\Textarea::make('extra_attributes')
@@ -691,10 +697,9 @@ class ContactFormResource extends Resource
             $string .= ' | ' . ($data['inline'] ? 'inline' : 'stacked');
         }
 
-
-        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && !empty($data['options'])) {
+        if (in_array(strtolower($actionType), ['select', 'radio', 'checkbox']) && ! empty($data['options'])) {
             $newItem['options'] = $data['options'];
-            $optionsStr = implode(' | ', array_map(fn($option) => $option['label'], $data['options']));
+            $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
         }
         if (strtolower($actionType) === 'file') {

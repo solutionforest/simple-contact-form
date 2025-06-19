@@ -135,7 +135,7 @@ class ContactFormComponent extends Component implements HasForms
 
         switch (strtolower($type)) {
             case 'text':
-                
+
                 return Components\TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
