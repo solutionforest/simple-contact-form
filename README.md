@@ -43,17 +43,21 @@ php artisan vendor:publish --tag="simple-contact-form-migrations"
 php artisan migrate
 ```
 
-You can publish the config file with:
+Register the plugin in your Panel provider:
 
-```bash
-php artisan vendor:publish --tag="simple-contact-form-config"
+```php
+use SolutionForest\SimpleContactForm\SimpleContactFormPlugin;
+
+public function panel(Panel $panel): Panel
+{
+    return $panel
+        // ...
+        ->plugins([
+            SimpleContactFormPlugin::make(),
+        ]);
+}
 ```
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="simple-contact-form-views"
-```
 
 ## Usage
 
