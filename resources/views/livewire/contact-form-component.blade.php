@@ -1,9 +1,4 @@
-<div class="inline-block w-auto">
-    @once
-        @livewireStyles
-        @filamentStyles
-        @livewire('notifications')
-    @endonce
+
     <form wire:submit="create" {!! $this->customClass !!}>
         <div>
             {{ $this->form }}
@@ -17,8 +12,4 @@
         @endif
     </form>
 
-    @once
-        @livewireScripts
-        @filamentScripts
-    @endonce
-</div>
+  

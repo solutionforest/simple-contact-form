@@ -9,6 +9,7 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
 use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
 use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
@@ -59,6 +60,9 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
         if (class_exists(\Livewire\Livewire::class)) {
             \Livewire\Livewire::component('contact-form', \SolutionForest\SimpleContactForm\Livewire\ContactFormComponent::class);
         }
+        if(class_exists(Blade::class)) {
+            Blade::component('simple-contact-form', \SolutionForest\SimpleContactForm\View\Components\SimpleContactForm::class);
+        }
     }
 
     public function packageRegistered(): void {}
@@ -78,7 +82,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
 
         // Icon Registration
         FilamentIcon::register($this->getIcons());
-
+       
         // Handle Stubs
         if (app()->runningInConsole()) {
             foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
