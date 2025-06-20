@@ -25,23 +25,24 @@ class SimpleContactFormCommand extends Command
     protected function publishLanguageFiles(): void
     {
         $langPath = base_path('lang/vendor/simple-contact-form');
-        
+
         if (File::isDirectory($langPath)) {
             $this->info('Language files already exist. Overwriting...');
         }
-        
+
         $sourcePath = __DIR__ . '/../../resources/lang';
-        
+
         if (! File::isDirectory($sourcePath)) {
             $this->error('Language files source directory not found!');
+
             return;
         }
-        
+
         File::ensureDirectoryExists($langPath);
-        
+
         // Copy all language files
         File::copyDirectory($sourcePath, $langPath);
-        
+
         $this->info('Simple Contact Form language files published successfully!');
         $this->info('You can now customize them at: ' . $langPath);
     }

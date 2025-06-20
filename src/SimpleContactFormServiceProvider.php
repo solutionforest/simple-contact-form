@@ -52,7 +52,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
 
         if (file_exists($package->basePath('/../resources/lang'))) {
             $package->hasTranslations();
-            
+
             // Register language files for publishing separately
             if (app()->runningInConsole()) {
                 $this->publishes([
