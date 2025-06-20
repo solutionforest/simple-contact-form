@@ -2,5 +2,5 @@
 
 // config for SolutionForest/SimpleContactForm
 return [
-    
+
 ];

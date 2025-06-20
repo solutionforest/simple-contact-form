@@ -297,20 +297,17 @@ class ContactFormComponent extends Component implements HasForms
                     ->body('Mail sending is disabled in the configuration.')
                     ->warning()
                     ->send();
+
                 return;
             }
 
-            
-            Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody, $formData) {
+            Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody) {
                 $message->to($replacedTo)
                     ->subject($replacedSubject)
                     ->html($replacedBody);
                 // Handle attachments
 
-               
-
             });
-        
 
             Notification::make()
                 ->title($this->contactForm->success_message ?? 'Success')
