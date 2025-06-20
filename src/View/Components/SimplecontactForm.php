@@ -3,7 +3,6 @@
 namespace SolutionForest\SimpleContactForm\View\Components;
 
 use Illuminate\View\Component;
-use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class SimpleContactForm extends Component
 {
@@ -23,10 +22,9 @@ class SimpleContactForm extends Component
      */
     public function __construct($form, $class = null)
     {
-        if($form){
+        if ($form) {
             $this->form = $form;
-        }
-        else {
+        } else {
             $this->form = null;
         }
 

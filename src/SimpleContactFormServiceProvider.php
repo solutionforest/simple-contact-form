@@ -60,7 +60,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
         if (class_exists(\Livewire\Livewire::class)) {
             \Livewire\Livewire::component('contact-form', \SolutionForest\SimpleContactForm\Livewire\ContactFormComponent::class);
         }
-        if(class_exists(Blade::class)) {
+        if (class_exists(Blade::class)) {
             Blade::component('simple-contact-form', \SolutionForest\SimpleContactForm\View\Components\SimpleContactForm::class);
         }
     }
@@ -82,7 +82,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
 
         // Icon Registration
         FilamentIcon::register($this->getIcons());
-       
+
         // Handle Stubs
         if (app()->runningInConsole()) {
             foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
