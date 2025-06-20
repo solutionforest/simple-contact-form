@@ -400,7 +400,7 @@ class ContactFormResource extends Resource
 
     public static function getModelaction(): array
     {
-        $actionsList = ['text', 'date', 'textarea', 'select', 'radio', 'file', 'checkbox'];
+        $actionsList = ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
         $actions = [];
 
         foreach ($actionsList as $actionType) {
@@ -531,31 +531,6 @@ class ContactFormResource extends Resource
                     ->itemLabel(fn (array $state): ?string => $state['label'] ?? null);
 
                 break;
-            case 'file':
-                $fields[] = Forms\Components\Select::make('file_types')
-                    ->label('Allowed File Types')
-                    ->multiple()
-                    ->options([
-                        'image/jpeg' => 'JPG',
-                        'image/jpeg' => 'JPEG',
-                        'image/png' => 'PNG',
-                        'application/pdf' => 'PDF',
-                        'application/msword' => 'DOC',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'DOCX',
-                        'application/vnd.ms-excel' => 'XLS',
-                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
-                        'text/plain' => 'TXT',
-                        'application/zip' => 'ZIP',
-                    ])
-                    ->searchable()
-                    ->helperText('Select allowed file types');
-                $fields[] = Forms\Components\TextInput::make('max_size')
-                    ->label('Maximum File Size (mb) ')
-                    ->numeric()
-                    ->default(5)
-                    ->helperText('Maximum file size in megabytes');
-
-                break;
             case 'checkbox':
                 $fields[] = Forms\Components\Toggle::make('inline')
                     ->label('Inline Options')
@@ -597,16 +572,6 @@ class ContactFormResource extends Resource
 
                 break;
             default:
-                // $fields[] = Forms\Components\Toggle::make('email')
-                //     ->label('Email Field')
-                //     ->default(false);
-                // $fields[] = Forms\Components\Toggle::make('tel')
-                //     ->label('Phone Field')
-                //     ->default(false);
-                //     // ->helperText('Enable phone validation for this field');
-                // $fields[] = Forms\Components\Toggle::make('number')
-                //     ->label('Number Field')
-                //     ->default(false);
 
                 $fields[] = Forms\Components\ToggleButtons::make('validation_type')
                     ->label('Validation Type')
@@ -742,17 +707,6 @@ class ContactFormResource extends Resource
             $newItem['options'] = $data['options'];
             $optionsStr = implode(' | ', array_map(fn ($option) => $option['label'], $data['options']));
             $string .= ' | option =  [ ' . $optionsStr . ' ] ';
-        }
-        if (strtolower($actionType) === 'file') {
-            if (isset($data['file_types'])) {
-                $newItem['file_types'] = $data['file_types'];
-                $typeStr = implode(' | ', $data['file_types']);
-                $string .= ' | accept =  [ ' . $typeStr . ' ]';
-            }
-            if (isset($data['max_size'])) {
-                $newItem['max_size'] = $data['max_size'];
-                $string .= ' | szie = ' . $data['max_size'] . ' mb ]';
-            }
         }
 
         $string .= ' ]';

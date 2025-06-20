@@ -187,26 +187,6 @@ class ContactFormComponent extends Component implements HasForms
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
 
-            case 'file':
-                return Components\FileUpload::make($name)
-                    ->label($label)
-                    ->acceptedFileTypes(
-                        ! empty($field['file_types'])
-                        ? $field['file_types']
-                        : null
-                    )
-                    ->maxSize(
-                        ! empty($field['max_size'])
-                        ? ($field['max_size'] * 1024)
-                        : null
-                    )
-                    ->disk('public')
-                    ->visibility('public')
-                    ->directory('contact-uploads')
-                    ->preserveFilenames()
-                    ->live()
-                    // ->extraAttributes($extraAttributes)
-                    ->required($required);
             case 'date':
                 $dateComponent = null;
                 if (! empty($field['include_time'])) {
@@ -311,33 +291,26 @@ class ContactFormComponent extends Component implements HasForms
         $replacedBody = $this->replaceVariables(str($emailBody)->sanitizeHtml(), $formData);
 
         try {
+            if (! config('simple-contact-form.mail.enable', true)) {
+                Notification::make()
+                    ->title('Mail sending is disabled')
+                    ->body('Mail sending is disabled in the configuration.')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            
             Mail::send([], [], function ($message) use ($replacedTo, $replacedSubject, $replacedBody, $formData) {
                 $message->to($replacedTo)
                     ->subject($replacedSubject)
                     ->html($replacedBody);
                 // Handle attachments
 
-                foreach ($formData as $key => $value) {
-
-                    // if (is_array($value) && isset($value['livewire'])) {
-                    //     $path = storage_path('app/livewire-tmp/' . $value['livewire']);
-                    //     if (file_exists($path)) {
-                    //         $originalName = $value['name'] ?? basename($path);
-                    //         $message->attach($path, ['as' => $originalName]);
-                    //     }
-                    // } else
-                    if (in_array($key, $this->referencedFields)) {
-                        if (is_string($value) && strpos($value, 'contact-uploads/') === 0) {
-                            $path = storage_path('app/public/' . $value);
-                            if (file_exists($path)) {
-                                $originalName = basename($value);
-                                $message->attach($path, ['as' => $originalName]);
-                            }
-                        }
-                    }
-                }
+               
 
             });
+        
 
             Notification::make()
                 ->title($this->contactForm->success_message ?? 'Success')

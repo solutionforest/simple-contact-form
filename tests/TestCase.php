@@ -52,9 +52,7 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_simple-contact-form_table.php.stub';
+        $migration = include __DIR__.'/../database/migrations/create_simple_contact_form_table.php.stub';
         $migration->up();
-        */
     }
 }

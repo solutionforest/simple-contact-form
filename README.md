@@ -11,15 +11,22 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 ## Features
 
 - 🚀 **Easy Installation** - Get up and running in minutes
-- 📝 **Form Builder** - Drag-and-drop form field management
-- 📧 **Email Notifications** - Automatic email sending on form submission
+- 📝 **Basic Form Management** - Create and manage contact forms
+- 📧 **Email Notifications** - Receive form submissions via email
 - 💾 **Database Storage** - Store form submissions in your database
-- 🎨 **Customizable Templates** - Full control over form appearance
-- 🔒 **Spam Protection** - Built-in honeypot and optional reCAPTCHA support
-- 📊 **Submission Management** - View and manage form submissions in Filament
-- 🌐 **Multi-language Support** - Translatable form fields and messages
+- 🔒 **Spam Protection** - Built-in honeypot functionality
+- 📊 **Submission Viewing** - Review form submissions in Filament
 - 📱 **Responsive Design** - Mobile-friendly forms out of the box
-- 🔧 **Developer Friendly** - Extensible with hooks and events
+
+## Coming Soon
+
+- 🎨 **Advanced Form Builder** - Drag-and-drop form field management
+- 🌐 **Multi-language Support** - Translatable form fields and messages
+- 🔧 **Developer API** - Extensible with hooks and events
+- 📋 **Custom Field Types** - Create your own field types
+- 🔀 **Conditional Logic** - Show/hide fields based on user input
+- 📑 **Multi-step Forms** - Create forms with multiple pages
+- 🔍 **Advanced Spam Protection** - reCAPTCHA integration
 
 ## Installation
 
@@ -48,54 +55,26 @@ Optionally, you can publish the views using
 php artisan vendor:publish --tag="simple-contact-form-views"
 ```
 
-## Configuration
-
-The configuration file will be published to `config/simple-contact-form.php`:
-
-```php
-return [
-    'storage' => [
-        'enabled' => true,
-        'table' => 'contact_form_submissions',
-    ],
-    
-    'email' => [
-        'enabled' => true,
-        'from' => env('MAIL_FROM_ADDRESS'),
-        'from_name' => env('MAIL_FROM_NAME'),
-    ],
-    
-    'spam_protection' => [
-        'honeypot' => true,
-        'recaptcha' => false,
-        'recaptcha_site_key' => env('RECAPTCHA_SITE_KEY'),
-        'recaptcha_secret_key' => env('RECAPTCHA_SECRET_KEY'),
-    ],
-    
-    'file_uploads' => [
-        'enabled' => true,
-        'disk' => 'public',
-        'max_size' => 5120, // KB
-        'allowed_types' => ['pdf', 'doc', 'docx', 'jpg', 'png'],
-    ],
-];
-```
-
 ## Usage
 
 ### Creating a Form
 
 1. Navigate to the "Contact Forms" section in your Filament admin panel
 2. Click "Create Form"
-3. Add fields using the form builder:
+3. Configure the basic form settings:
+   - Form Name
+   - Email Content
+   - Success Message
+   - Error Message
+   - Email Subject
+4. Add fields using the form builder:
    - Text Input
    - Email Input
    - Textarea
    - Select Dropdown
    - Radio Buttons
    - Checkboxes
-   - File Upload
-   - Hidden Fields
+
 
 ### Displaying Forms
 
@@ -105,133 +84,32 @@ Use the Blade component in your views:
 <x-simple-contact-form :form="contact" />
 ```
 
-Or use the shortcode in your content:
-
-```
-[simple-contact-form id="1"]
-```
-
-### Handling Submissions
-
-Submissions are automatically stored in the database and can be viewed in the Filament admin panel.
-
-To handle submissions programmatically:
-
-```php
-use SolutionForest\SimpleContactForm\Events\FormSubmitted;
-
-class ContactFormListener
-{
-    public function handle(FormSubmitted $event)
-    {
-        $form = $event->form;
-        $data = $event->data;
-        
-        // Custom processing logic
-    }
-}
-```
-
-### Customizing Email Templates
-
-Publish and modify the email templates:
-
-```bash
-php artisan vendor:publish --tag="simple-contact-form-emails"
-```
-
-Edit the templates in `resources/views/vendor/simple-contact-form/emails/`
-
-## Advanced Features
-
-### Custom Field Types
-
-Register custom field types:
-
-```php
-use SolutionForest\SimpleContactForm\Facades\SimpleContactForm;
-
-SimpleContactForm::registerFieldType('custom_field', CustomFieldType::class);
-```
-
-### Validation Rules
-
-Add custom validation rules to fields:
-
-```php
-$field->rules(['required', 'min:5', 'custom_rule']);
-```
-
-### Conditional Logic
-
-Show/hide fields based on user input:
-
-```php
-$field->showIf('other_field', 'equals', 'specific_value');
-```
-
-### Multi-step Forms
-
-Create multi-step forms with progress indicators:
-
-```php
-$form->steps([
-    'personal_info' => 'Personal Information',
-    'contact_details' => 'Contact Details',
-    'message' => 'Your Message',
-]);
-```
-
-## API Reference
-
-### Form Model
-
-```php
-$form = SimpleContactForm::create([
-    'name' => 'Contact Us',
-    'description' => 'Get in touch with our team',
-    'recipient_email' => 'contact@example.com',
-]);
-
-$form->addField([
-    'type' => 'text',
-    'name' => 'full_name',
-    'label' => 'Full Name',
-    'required' => true,
-]);
-```
-
-### Available Hooks
-
-```php
-// Before form submission
-SimpleContactForm::beforeSubmit(function ($form, $data) {
-    // Modify data before processing
-});
-
-// After successful submission
-SimpleContactForm::afterSubmit(function ($form, $submission) {
-    // Additional processing
-});
-```
-
-## Troubleshooting
 
 ### Common Issues
 
-**Forms not displaying:**
-- Ensure you've published the assets: `php artisan vendor:publish --tag="simple-contact-form-assets"`
-- Clear cache: `php artisan cache:clear`
 
 **Emails not sending:**
 - Check your mail configuration in `.env`
 - Verify SMTP credentials
 - Check Laravel log files
 
-**File uploads not working:**
-- Ensure storage directory is writable
-- Check file size limits in PHP configuration
-- Verify allowed file types in config
+**Lost style in view:**
+- Make sure you're using Tailwind CSS v3 (FilamentPHP 3 only supports Tailwind v3)
+- If you've upgraded to Tailwind v4, downgrade to v3 with `npm install tailwindcss@^3.0`
+- Make sure your `tailwind.config.js` looks like this:
+    ```js
+    import preset from './vendor/filament/support/tailwind.config.preset'
+
+    export default {
+            presets: [preset],
+            content: [
+                    './app/Filament/**/*.php',
+                    './resources/views/filament/**/*.blade.php',
+                    './vendor/filament/**/*.blade.php',
+            ],
+    }
+    ```
+
 
 ## Testing
 
