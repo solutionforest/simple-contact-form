@@ -98,21 +98,22 @@ class ContactFormResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->label(__('simple-contact-form::simple-contact-form.form.name'))
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Tabs::make('Tabs')
                     ->tabs([
                         Tabs\Tab::make('Template')
+                            ->label(__('simple-contact-form::simple-contact-form.form.template'))
                             ->schema([
                                 Forms\Components\Actions::make(self::getModelaction()),
                                 Placeholder::make('content_placeholder')
-                                    ->label('Usage')
-                                    ->content(new HtmlString('the item you add will display as following :
-                                                        [type | label | placeholder / options / [ accept | max_size ] ]'))
+                                    ->label(__('simple-contact-form::simple-contact-form.form.usage'))
+                                    ->content(new HtmlString(__('simple-contact-form::simple-contact-form.form.usage_content')))
                                     ->columnSpanFull(),
                                 Repeater::make('content')
                                     ->grid(2)
-                                    ->label('Content')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.content'))
                                     ->reorderable(false)
                                     ->addable(false)
                                     ->deletable(false)
@@ -161,7 +162,7 @@ class ContactFormResource extends Resource
                                     ->itemLabel(function (array $state) {
                                         $id = ($state['id'] ?? '0') + 1;
 
-                                        return "Session {$id}";
+                                        return __('simple-contact-form::simple-contact-form.form.session_label', ['number' => $id]);
                                     })
                                     ->maxItems(2)
                                     ->schema([
@@ -175,7 +176,7 @@ class ContactFormResource extends Resource
                                             ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
                                                 FormAction::make('edit')
-                                                    ->label('Edit')
+                                                    ->label(__('simple-contact-form::simple-contact-form.form.edit'))
                                                     ->icon('heroicon-o-pencil')
                                                     ->form(function (array $arguments, $livewire, $state, Repeater $component) {
                                                         $content = $livewire->data['content'] ?? [];
@@ -262,10 +263,11 @@ class ContactFormResource extends Resource
                             ]),
 
                         Tabs\Tab::make('Mail')
+                            ->label(__('simple-contact-form::simple-contact-form.form.mail'))
                             ->schema([
                                 // Forms\Components\Actions::make(self::getItemCopyActions()),
                                 Placeholder::make('variables_placeholder')
-                                    ->label('Available Variables :')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.available_variables'))
                                     ->content(function (Forms\Get $get) {
                                         $content = $get('content') ?? [];
                                         $variables = [];
@@ -281,42 +283,45 @@ class ContactFormResource extends Resource
                                             }
                                         }
 
-                                        return count($variables) ? implode(', ', $variables) : 'No variables available';
+                                        return count($variables) ? implode(', ', $variables) : __('simple-contact-form::simple-contact-form.no_variables');
                                     })
-                                    ->helperText('You can use these variables in your email ')
+                                    ->helperText(__('simple-contact-form::simple-contact-form.form.available_variables_help'))
                                     ->columnSpanFull(),
                                 // Forms\Components\TextInput::make('email')
                                 //     // ->email()
                                 //     ->required()
                                 //     ->maxLength(255),
                                 Forms\Components\TextInput::make('subject')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.subject'))
                                     ->required()
                                     ->maxLength(255),
                                 // Forms\Components\TextInput::make('from')
                                 //     ->required()
                                 //     ->maxLength(255),
                                 Forms\Components\TextInput::make('to')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.to'))
                                     ->required()
                                     ->maxLength(255),
                                 RichEditor::make('email_body')
-                                    ->label('Email body')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.email_body'))
                                     ->required()
                                     ->columnSpanFull()
-                                    ->helperText('You can use the variables like : user name : {{name}}'),
+                                    ->helperText(__('simple-contact-form::simple-contact-form.form.email_body_help')),
                             ]),
 
                         Tabs\Tab::make('Messages')
+                            ->label(__('simple-contact-form::simple-contact-form.form.messages'))
                             ->schema([
                                 Forms\Components\TextInput::make('success_message')
-                                    ->label('Success message')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.success_message'))
                                     ->required()
                                     ->maxLength(255)
-                                    ->helperText('Message to show after successful form submission'),
+                                    ->helperText(__('simple-contact-form::simple-contact-form.form.success_message_help')),
                                 Forms\Components\TextInput::make('error_message')
-                                    ->label('Error message')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.error_message'))
                                     ->required()
                                     ->maxLength(255)
-                                    ->helperText('Message to show after form submission error'),
+                                    ->helperText(__('simple-contact-form::simple-contact-form.form.error_message_help')),
                                 // Forms\Components\TextInput::make('validation_error_message')
                                 //     ->label('Validation error message')
                                 //     ->required()
@@ -324,11 +329,11 @@ class ContactFormResource extends Resource
                                 //     ->helperText('Message to show after validation error'),
                             ]),
                         Tabs\Tab::make('extra_attuributes')
-                            ->label('Extra Attributes')
+                            ->label(__('simple-contact-form::simple-contact-form.form.extra_attributes'))
                             ->schema([
                                 Textarea::make('extra_attributes')
-                                    ->label('Extra Attributes')
-                                    ->helperText('Optional extra attributes for the form, e.g., "class"="border border-dark rounded-xl m-w-2xl p-6"')
+                                    ->label(__('simple-contact-form::simple-contact-form.form.extra_attributes'))
+                                    ->helperText(__('simple-contact-form::simple-contact-form.form.extra_attributes_help'))
                                     ->rows(2)
                                     ->live(),
                                 // ->afterStateUpdated(function ($state, $set) {
@@ -351,10 +356,11 @@ class ContactFormResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('simple-contact-form::simple-contact-form.form.id'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('simple-contact-form::simple-contact-form.form.name'))
                     ->searchable()
                     ->sortable(),
                 // Tables\Columns\TextColumn::make('email')
@@ -405,7 +411,7 @@ class ContactFormResource extends Resource
 
         foreach ($actionsList as $actionType) {
             $actions[$actionType] = FormAction::make($actionType)
-                ->label(ucfirst($actionType))
+                ->label(__('simple-contact-form::simple-contact-form.field_types.' . $actionType))
                 ->color('primary')
                 ->form(
                     function (array $data, $livewire) use ($actionType) {
@@ -456,18 +462,18 @@ class ContactFormResource extends Resource
         $fields = [];
         if ($content) {
             $fields[] = ToggleButtons::make('section')
-                ->label('Section')
+                ->label(__('simple-contact-form::simple-contact-form.field.section'))
                 ->required()
                 ->options(function (Forms\Get $get) use ($content): array {
                     $options = [];
                     foreach ($content as $uuid => $item) {
                         $sessionId = $item['id'] + 1 ?? 1;
-                        $options[$item['id']] = "Session {$sessionId}";
+                        $options[$item['id']] = __('simple-contact-form::simple-contact-form.form.session_label', ['number' => $sessionId]);
                     }
 
                     if (empty($options)) {
-                        $options['0'] = 'Session 1';
-                        $options['1'] = 'Session 2';
+                        $options['0'] = __('simple-contact-form::simple-contact-form.form.session_label', ['number' => 1]);
+                        $options['1'] = __('simple-contact-form::simple-contact-form.form.session_label', ['number' => 2]);
                     }
 
                     return $options;
@@ -479,7 +485,7 @@ class ContactFormResource extends Resource
         }
 
         $fields[] = Forms\Components\TextInput::make('label')
-            ->label('Field Label')
+            ->label(__('simple-contact-form::simple-contact-form.field.label'))
             ->required()
             ->live(onBlur: true)
             ->afterStateUpdated(function ($state, $set, $get) {
@@ -490,9 +496,9 @@ class ContactFormResource extends Resource
                 }
             });
         $fields[] = Forms\Components\TextInput::make('name')
-            ->label('Field Name')
+            ->label(__('simple-contact-form::simple-contact-form.field.name'))
             ->required()
-            ->helperText('use for identification in the email body , no spaces or special characters')
+            ->helperText(__('simple-contact-form::simple-contact-form.field.name_help'))
             ->live()
             ->afterStateUpdated(function ($state, $set) {
                 // Convert spaces and punctuation to underscores
@@ -500,16 +506,17 @@ class ContactFormResource extends Resource
                 $set('name', $sanitized);
             });
         $fields[] = Forms\Components\Toggle::make('required')
-            ->label('Required Field')
+            ->label(__('simple-contact-form::simple-contact-form.field.required'))
             ->default(true);
 
         switch (strtolower($actionType)) {
             case 'select':
             case 'radio':
                 $fields[] = Repeater::make('options')
+                    ->label(__('simple-contact-form::simple-contact-form.field.options'))
                     ->schema([
                         Forms\Components\TextInput::make('label')
-                            ->label('option label')
+                            ->label(__('simple-contact-form::simple-contact-form.field.option_label'))
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
@@ -518,7 +525,7 @@ class ContactFormResource extends Resource
                                 $set('key', $generatedKey);
                             }),
                         Forms\Components\TextInput::make('key')
-                            ->label('key')
+                            ->label(__('simple-contact-form::simple-contact-form.field.key'))
                             ->required()
                             ->readOnly()
                             ->maxLength(255),
@@ -533,54 +540,44 @@ class ContactFormResource extends Resource
                 break;
             case 'checkbox':
                 $fields[] = Forms\Components\Toggle::make('inline')
-                    ->label('Inline Options')
+                    ->label(__('simple-contact-form::simple-contact-form.field.inline'))
                     ->default(true);
 
                 break;
             case 'date':
                 $fields[] = Forms\Components\Toggle::make('include_time')
-                    ->label('Include Time')
+                    ->label(__('simple-contact-form::simple-contact-form.field.include_time'))
                     ->default(false);
                 $fields[] = Forms\Components\Select::make('date_format')
-                    ->label('Date Format')
-                    ->options([
-                        'Y-m-d' => 'YYYY-MM-DD',
-                        'd/m/Y' => 'DD/MM/YYYY',
-                        'm/d/Y' => 'MM/DD/YYYY',
-                        'Y.m.d' => 'YYYY.MM.DD',
-                    ])
+                    ->label(__('simple-contact-form::simple-contact-form.field.date_format'))
+                    ->options(__('simple-contact-form::simple-contact-form.date_formats'))
                     ->default('Y-m-d');
                 $fields[] = Forms\Components\DatePicker::make('min_date')
-                    ->label('Minimum Date')
-                    ->helperText('Optional minimum selectable date');
+                    ->label(__('simple-contact-form::simple-contact-form.field.min_date'))
+                    ->helperText(__('simple-contact-form::simple-contact-form.field.min_date_help'));
                 $fields[] = Forms\Components\DatePicker::make('max_date')
-                    ->label('Maximum Date')
-                    ->helperText('Optional maximum selectable date');
+                    ->label(__('simple-contact-form::simple-contact-form.field.max_date'))
+                    ->helperText(__('simple-contact-form::simple-contact-form.field.max_date_help'));
 
                 break;
             case 'textarea':
                 $fields[] = Forms\Components\TextInput::make('min_length')
-                    ->label('Minimum Length')
+                    ->label(__('simple-contact-form::simple-contact-form.field.min_length'))
                     ->numeric()
                     ->default(0)
-                    ->helperText('Minimum number of characters required');
+                    ->helperText(__('simple-contact-form::simple-contact-form.field.min_length_help'));
                 $fields[] = Forms\Components\TextInput::make('max_length')
-                    ->label('Maximum Length')
+                    ->label(__('simple-contact-form::simple-contact-form.field.max_length'))
                     ->numeric()
                     ->default(500)
-                    ->helperText('Maximum number of characters allowed');
+                    ->helperText(__('simple-contact-form::simple-contact-form.field.max_length_help'));
 
                 break;
             default:
 
                 $fields[] = Forms\Components\ToggleButtons::make('validation_type')
-                    ->label('Validation Type')
-                    ->options([
-                        'none' => 'None',
-                        'email' => 'Email',
-                        'tel' => 'Phone',
-                        'number' => 'Number',
-                    ])
+                    ->label(__('simple-contact-form::simple-contact-form.field.validation_type'))
+                    ->options(__('simple-contact-form::simple-contact-form.validation_types'))
                     ->inline()
                     ->default('none')
                     ->live()
@@ -605,19 +602,19 @@ class ContactFormResource extends Resource
                         }
                     });
                 $fields[] = Forms\Components\Hidden::make('email')
-                    ->label('Email Field')
+                    ->label(__('simple-contact-form::simple-contact-form.field.email_field'))
                     ->default(false);
                 $fields[] = Forms\Components\Hidden::make('tel')
-                    ->label('Phone Field')
+                    ->label(__('simple-contact-form::simple-contact-form.field.phone_field'))
                     ->default(false);
                 // ->helperText('Enable phone validation for this field');
                 $fields[] = Forms\Components\Hidden::make('number')
-                    ->label('Number Field')
+                    ->label(__('simple-contact-form::simple-contact-form.field.number_field'))
                     ->default(false);
 
                 $fields[] = Forms\Components\TextInput::make('placeholder')
-                    ->label('Placeholder Text')
-                    ->helperText('Optional placeholder text for the field');
+                    ->label(__('simple-contact-form::simple-contact-form.field.placeholder'))
+                    ->helperText(__('simple-contact-form::simple-contact-form.field.placeholder_help'));
 
                 break;
         }

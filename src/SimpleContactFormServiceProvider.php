@@ -52,6 +52,13 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
 
         if (file_exists($package->basePath('/../resources/lang'))) {
             $package->hasTranslations();
+            
+            // Register language files for publishing separately
+            if (app()->runningInConsole()) {
+                $this->publishes([
+                    $package->basePath('/../resources/lang') => resource_path('lang/vendor/simple-contact-form'),
+                ], 'simple-contact-form-lang');
+            }
         }
 
         if (file_exists($package->basePath('/../resources/views'))) {
@@ -123,8 +130,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
     protected function getCommands(): array
     {
         return [
-            // Uncomment the line below to enable the command
-            // SimpleContactFormCommand::class,
+            SimpleContactFormCommand::class,
         ];
     }
 

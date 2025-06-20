@@ -13,20 +13,14 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 - 🚀 **Easy Installation** - Get up and running in minutes
 - 📝 **Basic Form Management** - Create and manage contact forms
 - 📧 **Email Notifications** - Receive form submissions via email
-- 💾 **Database Storage** - Store form submissions in your database
-- 🔒 **Spam Protection** - Built-in honeypot functionality
-- 📊 **Submission Viewing** - Review form submissions in Filament
 - 📱 **Responsive Design** - Mobile-friendly forms out of the box
 
 ## Coming Soon
 
-- 🎨 **Advanced Form Builder** - Drag-and-drop form field management
-- 🌐 **Multi-language Support** - Translatable form fields and messages
-- 🔧 **Developer API** - Extensible with hooks and events
-- 📋 **Custom Field Types** - Create your own field types
-- 🔀 **Conditional Logic** - Show/hide fields based on user input
-- 📑 **Multi-step Forms** - Create forms with multiple pages
-- 🔍 **Advanced Spam Protection** - reCAPTCHA integration
+- 📁 **File Upload** - Support for file attachments in forms
+- 🪝 **Form Hooks** - Before/after submit hooks for custom logic
+- ⚙️ **Configuration Options** - Adjustable settings for forms
+- 💾 **Submission Storage** - Save and manage form submissions
 
 ## Installation
 
@@ -57,6 +51,17 @@ public function panel(Panel $panel): Panel
         ]);
 }
 ```
+## Configuration
+
+### Customizing Translations
+
+If you need to modify the translations, publish the language files:
+
+```bash
+php artisan vendor:publish --tag="simple-contact-form-lang"
+```
+
+This will copy the language files to your application's `lang` directory where you can edit them.
 
 
 ## Usage

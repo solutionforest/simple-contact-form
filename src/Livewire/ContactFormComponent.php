@@ -42,7 +42,7 @@ class ContactFormComponent extends Component implements HasForms
             $this->form->fill();
         } catch (Exception $e) {
             $this->contactForm = new ContactForm;
-            $this->addError('formError', 'Contact form not found.');
+            $this->addError('formError', __('simple-contact-form::simple-contact-form.errors.form_not_found'));
         }
 
         if ($this->contactForm->extra_attributes) {
@@ -282,7 +282,7 @@ class ContactFormComponent extends Component implements HasForms
 
         // $emailFrom = $this->contactForm->from ?? config('mail.from.address');
         $emailTo = $this->contactForm->to ?? '';
-        $emailSubject = $this->contactForm->subject ?? 'New Contact Form Submission';
+        $emailSubject = $this->contactForm->subject ?? __('simple-contact-form::simple-contact-form.form.default_subject');
         $emailBody = $this->contactForm->email_body ?? '';
 
         // $replacedFrom = $this->replaceVariables($emailFrom, $formData);
@@ -293,8 +293,8 @@ class ContactFormComponent extends Component implements HasForms
         try {
             if (! config('simple-contact-form.mail.enable', true)) {
                 Notification::make()
-                    ->title('Mail sending is disabled')
-                    ->body('Mail sending is disabled in the configuration.')
+                    ->title(__('simple-contact-form::simple-contact-form.errors.mail_disabled'))
+                    ->body(__('simple-contact-form::simple-contact-form.errors.mail_disabled_message'))
                     ->warning()
                     ->send();
 
@@ -310,7 +310,7 @@ class ContactFormComponent extends Component implements HasForms
             });
 
             Notification::make()
-                ->title($this->contactForm->success_message ?? 'Success')
+                ->title($this->contactForm->success_message ?? __('simple-contact-form::simple-contact-form.notifications.success'))
                 // ->body('Your contact form has been successfully submitted.')
                 ->success()
                 ->send();
@@ -322,8 +322,8 @@ class ContactFormComponent extends Component implements HasForms
             \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
 
             Notification::make()
-                ->title($this->contactForm->error_message ?? 'Error')
-                ->body('Error sending email: ' . $e->getMessage())
+                ->title($this->contactForm->error_message ?? __('simple-contact-form::simple-contact-form.notifications.error'))
+                ->body(__('simple-contact-form::simple-contact-form.errors.mail_error') . $e->getMessage())
                 ->danger()
                 ->send();
         }
