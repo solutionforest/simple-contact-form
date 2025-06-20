@@ -309,12 +309,12 @@ class ContactFormResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('success_message')
                                     ->label('Success message')
-                                    // ->required()
+                                    ->required()
                                     ->maxLength(255)
                                     ->helperText('Message to show after successful form submission'),
                                 Forms\Components\TextInput::make('error_message')
                                     ->label('Error message')
-                                    // ->required()
+                                    ->required()
                                     ->maxLength(255)
                                     ->helperText('Message to show after form submission error'),
                                 // Forms\Components\TextInput::make('validation_error_message')
