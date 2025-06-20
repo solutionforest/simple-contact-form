@@ -63,7 +63,20 @@ php artisan vendor:publish --tag="simple-contact-form-lang"
 
 This will copy the language files to your application's `lang` directory where you can edit them.
 
+### Email Setting
 
+For the plugin to send emails properly, ensure your Laravel mail configuration is set up correctly in your `.env` file:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.example.com 
+MAIL_PORT=587
+MAIL_USERNAME=your-email@example.com
+MAIL_PASSWORD=your-email-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=your-email@example.com
+MAIL_FROM_NAME="${APP_NAME}"
+```
 ## Usage
 
 ### Creating a Form
@@ -87,10 +100,10 @@ This will copy the language files to your application's `lang` directory where y
 
 ### Displaying Forms
 
-Use the Blade component in your views:
+Use the Blade component with form id in your views:
 
 ```blade
-<x-simple-contact-form :form="contact" />
+<x-simple-contact-form :form="1" />
 ```
 
 
@@ -101,6 +114,7 @@ Use the Blade component in your views:
 - Check your mail configuration in `.env`
 - Verify SMTP credentials
 - Check Laravel log files
+- smtp doc
 
 **Lost style in view:**
 - Make sure you're using Tailwind CSS v3 (FilamentPHP 3 only supports Tailwind v3)
