@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use SolutionForest\SimpleContactForm\Models\ContactForm;
 use Illuminate\Validation\ValidationException;
+use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 uses(RefreshDatabase::class);
 
@@ -173,7 +173,7 @@ test('form fields have unique names', function () {
 
     // Count occurrences of each field name
     $fieldNameCounts = array_count_values($fieldNames);
-    
+
     // Duplicate names will have a count > 1
     expect($fieldNameCounts['field_name'])->toBe(2);
 });

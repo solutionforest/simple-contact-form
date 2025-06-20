@@ -39,8 +39,8 @@ test('can duplicate a contact form', function () {
     $duplicateData = $originalForm->toArray();
     unset($duplicateData['id']);
     $duplicateData['name'] = 'Duplicate of ' . $originalForm->name;
-    
-    $duplicateForm = new ContactForm();
+
+    $duplicateForm = new ContactForm;
     $duplicateForm->fill($duplicateData);
     $duplicateForm->save();
 
@@ -95,11 +95,11 @@ test('can bulk delete contact forms', function () {
 
     // Assert
     $this->assertDatabaseCount('simple_contact_form_table', 2);
-    
+
     // Check which forms remain
     $remainingForms = ContactForm::all();
     $remainingIds = $remainingForms->pluck('id')->toArray();
-    
+
     expect($remainingIds)->toContain($forms[1]->id)
         ->and($remainingIds)->toContain($forms[3]->id)
         ->and($remainingIds)->not->toContain($forms[0]->id)
@@ -152,16 +152,16 @@ test('can search contact forms by name or email', function () {
     // Act & Assert - Search for multiple results
     $allForms = ContactForm::where(function ($query) {
         $query->where('name', 'like', '%Form%')
-              ->orWhere('to', 'like', '%@example.com%');
+            ->orWhere('to', 'like', '%@example.com%');
     })->get();
-    
+
     expect($allForms)->toHaveCount(3);
 });
 
 test('can add extra attributes to a form', function () {
     // Arrange
     $extraAttributes = 'class="custom-form","data-id"="123"';
-    
+
     // Act
     $form = ContactForm::create([
         'name' => 'Form With Attributes',
@@ -173,13 +173,13 @@ test('can add extra attributes to a form', function () {
         'error_message' => 'Test error',
         'extra_attributes' => $extraAttributes,
     ]);
-    
+
     // Refresh the model to ensure data is loaded correctly
     $form->refresh();
-    
+
     // Assert
     expect($form->extra_attributes)->toBe($extraAttributes);
-    
+
     // Database assertion
     $this->assertDatabaseHas('simple_contact_form_table', [
         'name' => 'Form With Attributes',
