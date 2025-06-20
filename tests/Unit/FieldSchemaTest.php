@@ -34,6 +34,7 @@ test('can create text field schema', function () {
     // Testing required status separately to handle differences in implementation
     expect($schema->isRequired())->toBeTrue();
 });
+
 test('can create email field schema', function () {
     $component = new ContactFormComponent();
     
