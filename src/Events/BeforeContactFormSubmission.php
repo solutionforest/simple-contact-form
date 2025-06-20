@@ -9,7 +9,9 @@ use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class BeforeContactFormSubmission
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     /**
      * The contact form instance.
@@ -28,8 +30,6 @@ class BeforeContactFormSubmission
     /**
      * Create a new event instance.
      *
-     * @param  \SolutionForest\SimpleContactForm\Models\ContactForm  $contactForm
-     * @param  array  $formData
      * @return void
      */
     public function __construct(ContactForm $contactForm, array $formData)
