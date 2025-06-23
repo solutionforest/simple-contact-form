@@ -105,6 +105,16 @@ Use the Blade component with form id in your views:
 ```blade
 <x-simple-contact-form :form="1" />
 ```
+### Preview 
+
+![image](https://github.com/user-attachments/assets/bdd693e7-222e-44cb-91b7-cc84627f7be4)
+![image](https://github.com/user-attachments/assets/e0b31810-aa74-4901-af38-0c560db01307)
+![image](https://github.com/user-attachments/assets/a8ca1358-2fac-41fa-a513-eab73d5fd015)
+![image](https://github.com/user-attachments/assets/b79934f5-070e-4e82-a9cc-1cf0a0fc8501)
+![image](https://github.com/user-attachments/assets/b92d9f24-431e-4acc-98c5-a6c4961b0231)
+<img width="654" alt="image" src="https://github.com/user-attachments/assets/bcabed84-f5e3-4c73-a291-52e89274f20b" />
+
+
 
 
 ### Common Issues
