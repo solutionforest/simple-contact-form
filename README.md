@@ -105,12 +105,7 @@ Use the Blade component with form id in your views:
 ```blade
 <x-simple-contact-form :form="1" />
 ```
-### Preview 
-<video controls src="backend.mov" title="Title"></video> 
-<video controls src="frontend.mov" title="Title"></video>
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
+
 
 ### Common Issues
 
