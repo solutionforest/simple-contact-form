@@ -48,7 +48,7 @@ class ContactFormComponent extends Component implements HasForms
         if ($this->contactForm->extra_attributes) {
 
             $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
-            // dd($this->customClass );
+          
         } else {
             $this->customClass = $customClass;
         }

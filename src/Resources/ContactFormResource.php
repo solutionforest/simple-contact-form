@@ -182,10 +182,10 @@ class ContactFormResource extends Resource
                                                         $content = $livewire->data['content'] ?? [];
 
                                                         $items = $component->getState() ?? [];
-                                                        // dd($content,$items, $component->getItemState($arguments['item']));
+                                                       
                                                         $itemKey = $arguments['item'] ?? null;
                                                         $item = $items[$itemKey] ?? null;
-                                                        //  dd($itemKey, $item,$content,$arguments);
+                                                        
                                                         // $record = $content[$item['section']]['items'][$itemKey];
                                                         $record = null;
                                                         foreach ($content as $sectionIndex => $section) {
@@ -713,7 +713,7 @@ class ContactFormResource extends Resource
         // $content[] = $newItem;
 
         // $livewire->data['content'] = $content;
-        // dd($newItem);
+       
         return $newItem;
     }
 }
