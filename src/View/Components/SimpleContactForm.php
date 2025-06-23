@@ -9,7 +9,7 @@ class SimpleContactForm extends Component
     /**
      * The contact form instance or ID.
      *
-     * @var \SolutionForest\SimpleContactForm\Models\ContactForm|int|string
+     * @var \SolutionForest\SimpleContactForm\Models\ContactForm|int|string|null
      */
     public $form;
 
@@ -17,10 +17,9 @@ class SimpleContactForm extends Component
      * Create a new component instance.
      *
      * @param  \SolutionForest\SimpleContactForm\Models\ContactForm|int|string  $form
-     * @param  string|null  $class
      * @return void
      */
-    public function __construct($form, $class = null)
+    public function __construct($form)
     {
         if ($form) {
             $this->form = $form;

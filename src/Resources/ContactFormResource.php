@@ -467,7 +467,7 @@ class ContactFormResource extends Resource
                 ->options(function (Forms\Get $get) use ($content): array {
                     $options = [];
                     foreach ($content as $uuid => $item) {
-                        $sessionId = $item['id'] + 1 ?? 1;
+                        $sessionId = $item['id'] + 1 ;
                         $options[$item['id']] = __('simple-contact-form::simple-contact-form.form.session_label', ['number' => $sessionId]);
                     }
 

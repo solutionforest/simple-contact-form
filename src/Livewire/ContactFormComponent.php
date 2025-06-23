@@ -15,12 +15,16 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
-
+use Filament\Forms\ComponentContainer;
+/**
+ * @property ComponentContainer $form
+ */
 class ContactFormComponent extends Component implements HasForms
 {
+
+
     use InteractsWithForms;
     use WithFileUploads;
-
     public ?array $data = [];
 
     public ?string $formId = null;
@@ -35,6 +39,7 @@ class ContactFormComponent extends Component implements HasForms
 
     public function mount($id, $customClass = null): void
     {
+
         $this->formId = $id;
 
         try {
@@ -45,23 +50,26 @@ class ContactFormComponent extends Component implements HasForms
             $this->addError('formError', __('simple-contact-form::simple-contact-form.errors.form_not_found'));
         }
 
-        if ($this->contactForm->extra_attributes) {
+        // if ($this->contactForm->extra_attributes) {
+        //     $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
+        // } else {
+        //     $this->customClass = $customClass;
+        // }
 
+        if (isset($this->contactForm->extra_attributes) && $this->contactForm->extra_attributes) {
             $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
-
         } else {
             $this->customClass = $customClass;
         }
     }
 
+
     public function hasFormContent(): bool
     {
-        if (! $this->contactForm) {
-            return false;
-        }
+
         $content = $this->contactForm->content ?? [];
         foreach ($content as $section) {
-            if (! empty($section['items'])) {
+            if (!empty($section['items'])) {
                 return true;
             }
         }
@@ -189,7 +197,7 @@ class ContactFormComponent extends Component implements HasForms
 
             case 'date':
                 $dateComponent = null;
-                if (! empty($field['include_time'])) {
+                if (!empty($field['include_time'])) {
                     $dateComponent = Components\DateTimePicker::make($name);
                 } else {
                     $dateComponent = Components\DatePicker::make($name);
@@ -198,9 +206,9 @@ class ContactFormComponent extends Component implements HasForms
                 return $dateComponent
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->format(! empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
-                    ->minDate(! empty($field['min_date']) ? $field['min_date'] : null)
-                    ->maxDate(! empty($field['max_date']) ? $field['max_date'] : null)
+                    ->format(!empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
+                    ->minDate(!empty($field['min_date']) ? $field['min_date'] : null)
+                    ->maxDate(!empty($field['max_date']) ? $field['max_date'] : null)
                     ->required($required);
 
             default:
@@ -212,68 +220,6 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
-    /**
-     * Convert extra_attributes from text format to array
-     * Format example: "class"="form-control","data-id"="123"
-     *
-     * @param  mixed  $attributes  Text format attributes or array
-     * @return array|null Converted attributes array, or null if conversion fails
-     */
-    private function formatExtraAttributes($attributes)
-    {
-        // If already an array, return it
-        if (is_array($attributes)) {
-            return $attributes;
-        }
-
-        // If empty, return null
-        if (empty($attributes)) {
-            return null;
-        }
-
-        // If it's a string, try to parse it into an array
-        if (is_string($attributes)) {
-            try {
-
-                // If not JSON, try to parse "key"="value","key"="value" format
-                $result = [];
-                $pattern = '/(?:"([^"]+)"|\'([^\']+)\')=(?:"([^"]*)"|\'([^\']*)\'|([^,]*))?(?:,|$)/';
-                if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
-                    foreach ($matches as $match) {
-                        $key = $match[1] ?? $match[2] ?? '';
-                        $value = $match[3] ?? $match[4] ?? $match[5] ?? '';
-
-                        if ($key !== '') {
-                            $result[$key] = $value;
-                        }
-                    }
-
-                    return $result;
-                }
-                // If the above pattern doesn't match, try a simpler pattern
-                $pattern = '/([^=,]+)=([^,]*)(?:,|$)/';
-                if (preg_match_all($pattern, $attributes, $matches, PREG_SET_ORDER)) {
-                    foreach ($matches as $match) {
-                        $key = trim($match[1], '"\'');
-                        $value = trim($match[2], '"\'');
-
-                        if ($key !== '') {
-                            $result[$key] = $value;
-                        }
-                    }
-
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('Error parsing extra_attributes: ' . $e->getMessage(), [
-                    'attributes' => $attributes,
-                ]);
-            }
-        }
-
-        // If conversion fails, return null
-        return null;
-    }
 
     public function create(): void
     {
@@ -291,7 +237,7 @@ class ContactFormComponent extends Component implements HasForms
         $replacedBody = $this->replaceVariables(str($emailBody)->sanitizeHtml(), $formData);
 
         try {
-            if (! config('simple-contact-form.mail.enable', true)) {
+            if (!config('simple-contact-form.mail.enable', true)) {
                 Notification::make()
                     ->title(__('simple-contact-form::simple-contact-form.errors.mail_disabled'))
                     ->body(__('simple-contact-form::simple-contact-form.errors.mail_disabled_message'))
