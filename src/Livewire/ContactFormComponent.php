@@ -3,6 +3,7 @@
 namespace SolutionForest\SimpleContactForm\Livewire;
 
 use Exception;
+use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Split;
@@ -15,16 +16,15 @@ use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
-use Filament\Forms\ComponentContainer;
+
 /**
  * @property ComponentContainer $form
  */
 class ContactFormComponent extends Component implements HasForms
 {
-
-
     use InteractsWithForms;
     use WithFileUploads;
+
     public ?array $data = [];
 
     public ?string $formId = null;
@@ -63,13 +63,12 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
-
     public function hasFormContent(): bool
     {
 
         $content = $this->contactForm->content ?? [];
         foreach ($content as $section) {
-            if (!empty($section['items'])) {
+            if (! empty($section['items'])) {
                 return true;
             }
         }
@@ -197,7 +196,7 @@ class ContactFormComponent extends Component implements HasForms
 
             case 'date':
                 $dateComponent = null;
-                if (!empty($field['include_time'])) {
+                if (! empty($field['include_time'])) {
                     $dateComponent = Components\DateTimePicker::make($name);
                 } else {
                     $dateComponent = Components\DatePicker::make($name);
@@ -206,9 +205,9 @@ class ContactFormComponent extends Component implements HasForms
                 return $dateComponent
                     ->label($label)
                     ->placeholder($placeholder)
-                    ->format(!empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
-                    ->minDate(!empty($field['min_date']) ? $field['min_date'] : null)
-                    ->maxDate(!empty($field['max_date']) ? $field['max_date'] : null)
+                    ->format(! empty($field['date_format']) ? $field['date_format'] : 'Y-m-d')
+                    ->minDate(! empty($field['min_date']) ? $field['min_date'] : null)
+                    ->maxDate(! empty($field['max_date']) ? $field['max_date'] : null)
                     ->required($required);
 
             default:
@@ -219,7 +218,6 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
         }
     }
-
 
     public function create(): void
     {
@@ -237,7 +235,7 @@ class ContactFormComponent extends Component implements HasForms
         $replacedBody = $this->replaceVariables(str($emailBody)->sanitizeHtml(), $formData);
 
         try {
-            if (!config('simple-contact-form.mail.enable', true)) {
+            if (! config('simple-contact-form.mail.enable', true)) {
                 Notification::make()
                     ->title(__('simple-contact-form::simple-contact-form.errors.mail_disabled'))
                     ->body(__('simple-contact-form::simple-contact-form.errors.mail_disabled_message'))
