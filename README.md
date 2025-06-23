@@ -129,6 +129,7 @@ Use the Blade component with form id in your views:
 **Lost style in view:**
 - Make sure you're using Tailwind CSS v3 (FilamentPHP 3 only supports Tailwind v3)
 - If you've upgraded to Tailwind v4, downgrade to v3 with `npm install tailwindcss@^3.0`
+- you can follow the guide of filament form installation : [https://filamentphp.com/docs/3.x/forms/installation]
 - Make sure your `tailwind.config.js` looks like this:
     ```js
     import preset from './vendor/filament/support/tailwind.config.preset'
