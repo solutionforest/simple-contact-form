@@ -1,3 +1,6 @@
+
+![Simple-Contact-Form](https://github.com/user-attachments/assets/302127a9-fada-404c-ade9-d7658a3bfa8c)
+
 # Simple Contact Form - FilamentPHP Plugin
 
 A lightweight, customizable contact form plugin for FilamentPHP that provides an easy-to-use alternative to Contact Form 7. Build and manage contact forms with a simple, intuitive interface directly from your Filament admin panel.
