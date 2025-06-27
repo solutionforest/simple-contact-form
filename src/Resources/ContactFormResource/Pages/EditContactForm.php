@@ -3,7 +3,6 @@
 namespace SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 
 use Filament\Actions\DeleteAction;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
 

@@ -2,10 +2,10 @@
 
 namespace SolutionForest\SimpleContactForm\View\Components;
 
-use SolutionForest\SimpleContactForm\Models\ContactForm;
-use Illuminate\Contracts\View\View;
 use Closure;
+use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
+use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 class SimpleContactForm extends Component
 {
@@ -19,7 +19,7 @@ class SimpleContactForm extends Component
     /**
      * Create a new component instance.
      *
-     * @param ContactForm|int|string $form
+     * @param  ContactForm|int|string  $form
      * @return void
      */
     public function __construct($form)

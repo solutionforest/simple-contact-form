@@ -2,9 +2,6 @@
 
 namespace SolutionForest\SimpleContactForm;
 
-use Livewire\Livewire;
-use SolutionForest\SimpleContactForm\Livewire\ContactFormComponent;
-use SolutionForest\SimpleContactForm\View\Components\SimpleContactForm;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
@@ -14,8 +11,11 @@ use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
 use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
+use SolutionForest\SimpleContactForm\Livewire\ContactFormComponent;
 use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
+use SolutionForest\SimpleContactForm\View\Components\SimpleContactForm;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

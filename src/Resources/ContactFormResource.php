@@ -2,37 +2,36 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
-use Illuminate\Support\Str;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Schemas\Components\Actions;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Actions\Action;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\ListContactForms;
-use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\CreateContactForm;
-use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\EditContactForm;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
+use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
-use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\CreateContactForm;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\EditContactForm;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\ListContactForms;
 
 class ContactFormResource extends Resource
 {

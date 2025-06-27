@@ -3,7 +3,6 @@
 namespace SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 
 use Filament\Actions\CreateAction;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
 
