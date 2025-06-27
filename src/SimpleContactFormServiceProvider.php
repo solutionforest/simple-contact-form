@@ -2,6 +2,9 @@
 
 namespace SolutionForest\SimpleContactForm;
 
+use Livewire\Livewire;
+use SolutionForest\SimpleContactForm\Livewire\ContactFormComponent;
+use SolutionForest\SimpleContactForm\View\Components\SimpleContactForm;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
@@ -64,11 +67,11 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
         }
-        if (class_exists(\Livewire\Livewire::class)) {
-            \Livewire\Livewire::component('contact-form', \SolutionForest\SimpleContactForm\Livewire\ContactFormComponent::class);
+        if (class_exists(Livewire::class)) {
+            Livewire::component('contact-form', ContactFormComponent::class);
         }
         if (class_exists(Blade::class)) {
-            Blade::component('simple-contact-form', \SolutionForest\SimpleContactForm\View\Components\SimpleContactForm::class);
+            Blade::component('simple-contact-form', SimpleContactForm::class);
         }
     }
 

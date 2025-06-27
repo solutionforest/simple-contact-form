@@ -2,15 +2,31 @@
 
 namespace SolutionForest\SimpleContactForm\Resources;
 
+use Illuminate\Support\Str;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Actions\Action;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\ListContactForms;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\CreateContactForm;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages\EditContactForm;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,7 +38,7 @@ class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public $record;
 
@@ -32,11 +48,11 @@ class ContactFormResource extends Resource
     {
         if (! $this->record?->exists) {
             $this->data['content'] = [
-                \Illuminate\Support\Str::uuid()->toString() => [
+                Str::uuid()->toString() => [
                     'id' => 0, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
-                \Illuminate\Support\Str::uuid()->toString() => [
+                Str::uuid()->toString() => [
                     'id' => 1, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
@@ -91,22 +107,22 @@ class ContactFormResource extends Resource
         // }
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
 
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
+        return $schema
+            ->components([
+                TextInput::make('name')
                     ->required()
                     ->label(__('simple-contact-form::simple-contact-form.form.name'))
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Tabs::make('Tabs')
                     ->tabs([
-                        Tabs\Tab::make('Template')
+                        Tab::make('Template')
                             ->label(__('simple-contact-form::simple-contact-form.form.template'))
                             ->schema([
-                                Forms\Components\Actions::make(self::getModelaction()),
+                                Actions::make(self::getModelaction()),
                                 Placeholder::make('content_placeholder')
                                     ->label(__('simple-contact-form::simple-contact-form.form.usage'))
                                     ->content(new HtmlString(__('simple-contact-form::simple-contact-form.form.usage_content')))
@@ -140,7 +156,7 @@ class ContactFormResource extends Resource
                                             }
                                         }
                                     })
-                                    ->afterStateUpdated(function (Repeater $component, $state, Forms\Get $get) {
+                                    ->afterStateUpdated(function (Repeater $component, $state, Get $get) {
                                         $items = $get('content') ?? [];
                                         $needsUpdate = false;
                                         foreach ($items as $key => $item) {
@@ -175,10 +191,10 @@ class ContactFormResource extends Resource
                                             ->collapsible(false)
                                             ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
                                             ->extraItemActions([
-                                                FormAction::make('edit')
+                                                Action::make('edit')
                                                     ->label(__('simple-contact-form::simple-contact-form.form.edit'))
                                                     ->icon('heroicon-o-pencil')
-                                                    ->form(function (array $arguments, $livewire, $state, Repeater $component) {
+                                                    ->schema(function (array $arguments, $livewire, $state, Repeater $component) {
                                                         $content = $livewire->data['content'] ?? [];
 
                                                         $items = $component->getState() ?? [];
@@ -262,13 +278,13 @@ class ContactFormResource extends Resource
 
                             ]),
 
-                        Tabs\Tab::make('Mail')
+                        Tab::make('Mail')
                             ->label(__('simple-contact-form::simple-contact-form.form.mail'))
                             ->schema([
                                 // Forms\Components\Actions::make(self::getItemCopyActions()),
                                 Placeholder::make('variables_placeholder')
                                     ->label(__('simple-contact-form::simple-contact-form.form.available_variables'))
-                                    ->content(function (Forms\Get $get) {
+                                    ->content(function (Get $get) {
                                         $content = $get('content') ?? [];
                                         $variables = [];
                                         foreach ($content as $section) {
@@ -277,7 +293,7 @@ class ContactFormResource extends Resource
                                             }
                                             foreach ($section['items'] as $field) {
                                                 if (isset($field['name'])) {
-                                                    $key = \Illuminate\Support\Str::slug($field['name'], '_');
+                                                    $key = Str::slug($field['name'], '_');
                                                     $variables[] = "{{{$key}}}";
                                                 }
                                             }
@@ -291,14 +307,14 @@ class ContactFormResource extends Resource
                                 //     // ->email()
                                 //     ->required()
                                 //     ->maxLength(255),
-                                Forms\Components\TextInput::make('subject')
+                                TextInput::make('subject')
                                     ->label(__('simple-contact-form::simple-contact-form.form.subject'))
                                     ->required()
                                     ->maxLength(255),
                                 // Forms\Components\TextInput::make('from')
                                 //     ->required()
                                 //     ->maxLength(255),
-                                Forms\Components\TextInput::make('to')
+                                TextInput::make('to')
                                     ->label(__('simple-contact-form::simple-contact-form.form.to'))
                                     ->required()
                                     ->maxLength(255),
@@ -309,15 +325,15 @@ class ContactFormResource extends Resource
                                     ->helperText(__('simple-contact-form::simple-contact-form.form.email_body_help')),
                             ]),
 
-                        Tabs\Tab::make('Messages')
+                        Tab::make('Messages')
                             ->label(__('simple-contact-form::simple-contact-form.form.messages'))
                             ->schema([
-                                Forms\Components\TextInput::make('success_message')
+                                TextInput::make('success_message')
                                     ->label(__('simple-contact-form::simple-contact-form.form.success_message'))
                                     ->required()
                                     ->maxLength(255)
                                     ->helperText(__('simple-contact-form::simple-contact-form.form.success_message_help')),
-                                Forms\Components\TextInput::make('error_message')
+                                TextInput::make('error_message')
                                     ->label(__('simple-contact-form::simple-contact-form.form.error_message'))
                                     ->required()
                                     ->maxLength(255)
@@ -328,7 +344,7 @@ class ContactFormResource extends Resource
                                 //     ->maxLength(255)
                                 //     ->helperText('Message to show after validation error'),
                             ]),
-                        Tabs\Tab::make('extra_attuributes')
+                        Tab::make('extra_attuributes')
                             ->label(__('simple-contact-form::simple-contact-form.form.extra_attributes'))
                             ->schema([
                                 Textarea::make('extra_attributes')
@@ -355,11 +371,11 @@ class ContactFormResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label(__('simple-contact-form::simple-contact-form.form.id'))
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label(__('simple-contact-form::simple-contact-form.form.name'))
                     ->searchable()
                     ->sortable(),
@@ -378,12 +394,12 @@ class ContactFormResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -398,9 +414,9 @@ class ContactFormResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContactForms::route('/'),
-            'create' => Pages\CreateContactForm::route('/create'),
-            'edit' => Pages\EditContactForm::route('/{record}/edit'),
+            'index' => ListContactForms::route('/'),
+            'create' => CreateContactForm::route('/create'),
+            'edit' => EditContactForm::route('/{record}/edit'),
         ];
     }
 
@@ -410,10 +426,10 @@ class ContactFormResource extends Resource
         $actions = [];
 
         foreach ($actionsList as $actionType) {
-            $actions[$actionType] = FormAction::make($actionType)
+            $actions[$actionType] = Action::make($actionType)
                 ->label(__('simple-contact-form::simple-contact-form.field_types.' . $actionType))
                 ->color('primary')
-                ->form(
+                ->schema(
                     function (array $data, $livewire) use ($actionType) {
                         $content = $livewire->data['content'] ?? [];
 
@@ -434,7 +450,7 @@ class ContactFormResource extends Resource
                         }
                     }
                     if ($sectionUuid === null) {
-                        $sectionUuid = \Illuminate\Support\Str::uuid()->toString();
+                        $sectionUuid = Str::uuid()->toString();
                         $content[$sectionUuid] = [
                             'id' => $sectionId,
                             'items' => [],
@@ -445,7 +461,7 @@ class ContactFormResource extends Resource
                         $content[$sectionUuid]['items'] = [];
                     }
 
-                    $itemUuid = \Illuminate\Support\Str::uuid()->toString();
+                    $itemUuid = Str::uuid()->toString();
                     $content[$sectionUuid]['items'][$itemUuid] = $newItem;
 
                     $livewire->data['content'] = $content;
@@ -464,7 +480,7 @@ class ContactFormResource extends Resource
             $fields[] = ToggleButtons::make('section')
                 ->label(__('simple-contact-form::simple-contact-form.field.section'))
                 ->required()
-                ->options(function (Forms\Get $get) use ($content): array {
+                ->options(function (Get $get) use ($content): array {
                     $options = [];
                     foreach ($content as $uuid => $item) {
                         $sessionId = $item['id'] + 1;
@@ -481,21 +497,21 @@ class ContactFormResource extends Resource
                 ->default(0)
                 ->inline();
 
-            $fields[] = Forms\Components\Hidden::make('section_id');
+            $fields[] = Hidden::make('section_id');
         }
 
-        $fields[] = Forms\Components\TextInput::make('label')
+        $fields[] = TextInput::make('label')
             ->label(__('simple-contact-form::simple-contact-form.field.label'))
             ->required()
             ->live(onBlur: true)
             ->afterStateUpdated(function ($state, $set, $get) {
-                $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
+                $generatedKey = Str::slug(str_replace(' ', '_', $state), '_');
                 $name = $get('name') ?? '';
                 if ($name == '') {
                     $set('name', $generatedKey);
                 }
             });
-        $fields[] = Forms\Components\TextInput::make('name')
+        $fields[] = TextInput::make('name')
             ->label(__('simple-contact-form::simple-contact-form.field.name'))
             ->required()
             ->helperText(__('simple-contact-form::simple-contact-form.field.name_help'))
@@ -505,7 +521,7 @@ class ContactFormResource extends Resource
                 $sanitized = preg_replace('/[\s\p{P}]+/u', '_', $state);
                 $set('name', $sanitized);
             });
-        $fields[] = Forms\Components\Toggle::make('required')
+        $fields[] = Toggle::make('required')
             ->label(__('simple-contact-form::simple-contact-form.field.required'))
             ->default(true);
 
@@ -515,16 +531,16 @@ class ContactFormResource extends Resource
                 $fields[] = Repeater::make('options')
                     ->label(__('simple-contact-form::simple-contact-form.field.options'))
                     ->schema([
-                        Forms\Components\TextInput::make('label')
+                        TextInput::make('label')
                             ->label(__('simple-contact-form::simple-contact-form.field.option_label'))
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, $set) {
-                                $generatedKey = \Illuminate\Support\Str::slug(str_replace(' ', '_', $state), '_');
+                                $generatedKey = Str::slug(str_replace(' ', '_', $state), '_');
                                 $set('key', $generatedKey);
                             }),
-                        Forms\Components\TextInput::make('key')
+                        TextInput::make('key')
                             ->label(__('simple-contact-form::simple-contact-form.field.key'))
                             ->required()
                             ->readOnly()
@@ -539,34 +555,34 @@ class ContactFormResource extends Resource
 
                 break;
             case 'checkbox':
-                $fields[] = Forms\Components\Toggle::make('inline')
+                $fields[] = Toggle::make('inline')
                     ->label(__('simple-contact-form::simple-contact-form.field.inline'))
                     ->default(true);
 
                 break;
             case 'date':
-                $fields[] = Forms\Components\Toggle::make('include_time')
+                $fields[] = Toggle::make('include_time')
                     ->label(__('simple-contact-form::simple-contact-form.field.include_time'))
                     ->default(false);
-                $fields[] = Forms\Components\Select::make('date_format')
+                $fields[] = Select::make('date_format')
                     ->label(__('simple-contact-form::simple-contact-form.field.date_format'))
                     ->options(__('simple-contact-form::simple-contact-form.date_formats'))
                     ->default('Y-m-d');
-                $fields[] = Forms\Components\DatePicker::make('min_date')
+                $fields[] = DatePicker::make('min_date')
                     ->label(__('simple-contact-form::simple-contact-form.field.min_date'))
                     ->helperText(__('simple-contact-form::simple-contact-form.field.min_date_help'));
-                $fields[] = Forms\Components\DatePicker::make('max_date')
+                $fields[] = DatePicker::make('max_date')
                     ->label(__('simple-contact-form::simple-contact-form.field.max_date'))
                     ->helperText(__('simple-contact-form::simple-contact-form.field.max_date_help'));
 
                 break;
             case 'textarea':
-                $fields[] = Forms\Components\TextInput::make('min_length')
+                $fields[] = TextInput::make('min_length')
                     ->label(__('simple-contact-form::simple-contact-form.field.min_length'))
                     ->numeric()
                     ->default(0)
                     ->helperText(__('simple-contact-form::simple-contact-form.field.min_length_help'));
-                $fields[] = Forms\Components\TextInput::make('max_length')
+                $fields[] = TextInput::make('max_length')
                     ->label(__('simple-contact-form::simple-contact-form.field.max_length'))
                     ->numeric()
                     ->default(500)
@@ -575,7 +591,7 @@ class ContactFormResource extends Resource
                 break;
             default:
 
-                $fields[] = Forms\Components\ToggleButtons::make('validation_type')
+                $fields[] = ToggleButtons::make('validation_type')
                     ->label(__('simple-contact-form::simple-contact-form.field.validation_type'))
                     ->options(__('simple-contact-form::simple-contact-form.validation_types'))
                     ->inline()
@@ -601,18 +617,18 @@ class ContactFormResource extends Resource
                             $set('number', true);
                         }
                     });
-                $fields[] = Forms\Components\Hidden::make('email')
+                $fields[] = Hidden::make('email')
                     ->label(__('simple-contact-form::simple-contact-form.field.email_field'))
                     ->default(false);
-                $fields[] = Forms\Components\Hidden::make('tel')
+                $fields[] = Hidden::make('tel')
                     ->label(__('simple-contact-form::simple-contact-form.field.phone_field'))
                     ->default(false);
                 // ->helperText('Enable phone validation for this field');
-                $fields[] = Forms\Components\Hidden::make('number')
+                $fields[] = Hidden::make('number')
                     ->label(__('simple-contact-form::simple-contact-form.field.number_field'))
                     ->default(false);
 
-                $fields[] = Forms\Components\TextInput::make('placeholder')
+                $fields[] = TextInput::make('placeholder')
                     ->label(__('simple-contact-form::simple-contact-form.field.placeholder'))
                     ->helperText(__('simple-contact-form::simple-contact-form.field.placeholder_help'));
 

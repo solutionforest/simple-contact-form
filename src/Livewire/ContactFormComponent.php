@@ -2,14 +2,21 @@
 
 namespace SolutionForest\SimpleContactForm\Livewire;
 
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Flex;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Support\Facades\Log;
 use Exception;
-use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Split;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
@@ -18,7 +25,7 @@ use Livewire\WithFileUploads;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 
 /**
- * @property ComponentContainer $form
+ * @property Schema $form
  */
 class ContactFormComponent extends Component implements HasForms
 {
@@ -101,7 +108,7 @@ class ContactFormComponent extends Component implements HasForms
         return implode(' ', $result);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         $schema = [];
         foreach ($this->contactForm->content ?? [] as $section) {
@@ -131,9 +138,9 @@ class ContactFormComponent extends Component implements HasForms
         }
 
         return $form
-            ->schema(
+            ->components(
                 [
-                    Split::make($schema)
+                    Flex::make($schema)
                         ->from('md'),
 
                     // ->schema($schema),
@@ -156,7 +163,7 @@ class ContactFormComponent extends Component implements HasForms
         switch (strtolower($type)) {
             case 'text':
 
-                return Components\TextInput::make($name)
+                return TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
                     ->email($field['email'] ?? false)
@@ -166,7 +173,7 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
 
             case 'textarea':
-                return Components\Textarea::make($name)
+                return Textarea::make($name)
                     ->label($label)
                     // ->placeholder($placeholder)
                     ->minLength($field['min_length'] ?? null)
@@ -174,20 +181,20 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
 
             case 'select':
-                return Components\Select::make($name)
+                return Select::make($name)
                     ->label($label)
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'checkbox':
-                return Components\Checkbox::make($name)
+                return Checkbox::make($name)
                     ->label($label)
                     // ->extraAttributes($extraAttributes)
                     ->required($required);
 
             case 'radio':
-                return Components\Radio::make($name)
+                return Radio::make($name)
                     ->label($label)
                     // ->inline()
                     ->options(collect($field['options'] ?? [])->pluck('label', 'key')->toArray())
@@ -197,9 +204,9 @@ class ContactFormComponent extends Component implements HasForms
             case 'date':
                 $dateComponent = null;
                 if (! empty($field['include_time'])) {
-                    $dateComponent = Components\DateTimePicker::make($name);
+                    $dateComponent = DateTimePicker::make($name);
                 } else {
-                    $dateComponent = Components\DatePicker::make($name);
+                    $dateComponent = DatePicker::make($name);
                 }
 
                 return $dateComponent
@@ -211,7 +218,7 @@ class ContactFormComponent extends Component implements HasForms
                     ->required($required);
 
             default:
-                return Components\TextInput::make($name)
+                return TextInput::make($name)
                     ->label($label)
                     ->placeholder($placeholder)
                     // ->extraAttributes($extraAttributes)
@@ -261,9 +268,9 @@ class ContactFormComponent extends Component implements HasForms
 
             $this->form->fill(); // Reset form
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Error handling
-            \Illuminate\Support\Facades\Log::error('Contact form email error: ' . $e->getMessage());
+            Log::error('Contact form email error: ' . $e->getMessage());
 
             Notification::make()
                 ->title($this->contactForm->error_message ?? __('simple-contact-form::simple-contact-form.notifications.error'))

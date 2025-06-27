@@ -2,6 +2,9 @@
 
 namespace SolutionForest\SimpleContactForm\View\Components;
 
+use SolutionForest\SimpleContactForm\Models\ContactForm;
+use Illuminate\Contracts\View\View;
+use Closure;
 use Illuminate\View\Component;
 
 class SimpleContactForm extends Component
@@ -9,14 +12,14 @@ class SimpleContactForm extends Component
     /**
      * The contact form instance or ID.
      *
-     * @var \SolutionForest\SimpleContactForm\Models\ContactForm|int|string|null
+     * @var ContactForm|int|string|null
      */
     public $form;
 
     /**
      * Create a new component instance.
      *
-     * @param  \SolutionForest\SimpleContactForm\Models\ContactForm|int|string  $form
+     * @param ContactForm|int|string $form
      * @return void
      */
     public function __construct($form)
@@ -32,7 +35,7 @@ class SimpleContactForm extends Component
     /**
      * Get the view / contents that represent the component.
      *
-     * @return \Illuminate\Contracts\View\View|\Closure|string
+     * @return View|Closure|string
      */
     public function render()
     {

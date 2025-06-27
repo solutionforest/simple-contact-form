@@ -13,7 +13,7 @@ test('can create text field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -39,7 +39,7 @@ test('can create email field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -64,7 +64,7 @@ test('can create textarea field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -87,7 +87,7 @@ test('can create checkbox field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -108,7 +108,7 @@ test('can create select field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -134,7 +134,7 @@ test('can create radio field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -159,7 +159,7 @@ test('can create date field schema', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 
@@ -198,7 +198,7 @@ test('returns default field for invalid field type', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected getFieldSchema method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('getFieldSchema');
     $method->setAccessible(true);
 

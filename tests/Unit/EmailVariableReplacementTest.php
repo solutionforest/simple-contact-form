@@ -6,7 +6,7 @@ test('replaces simple variables in text', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -26,7 +26,7 @@ test('handles missing variables', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -47,7 +47,7 @@ test('handles array values', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -66,7 +66,7 @@ test('handles array with name key', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -85,7 +85,7 @@ test('returns original text if no variables', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -104,7 +104,7 @@ test('handles multiple occurrences of same variable', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -124,7 +124,7 @@ test('tracks referenced fields', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 
@@ -147,7 +147,7 @@ test('handles whitespace in variables', function () {
     $component = new ContactFormComponent;
 
     // Use reflection to access the protected replaceVariables method
-    $reflectionClass = new \ReflectionClass($component);
+    $reflectionClass = new ReflectionClass($component);
     $method = $reflectionClass->getMethod('replaceVariables');
     $method->setAccessible(true);
 

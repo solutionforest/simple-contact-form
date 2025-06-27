@@ -16,7 +16,7 @@ class BeforeContactFormSubmission
     /**
      * The contact form instance.
      *
-     * @var \SolutionForest\SimpleContactForm\Models\ContactForm
+     * @var ContactForm
      */
     public $contactForm;
 
