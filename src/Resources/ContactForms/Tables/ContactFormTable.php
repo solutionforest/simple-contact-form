@@ -10,15 +10,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class ContactFormTable
-{   
+{
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ,
-                TextColumn::make('name')
-                    ,
+                TextColumn::make('id'),
+                TextColumn::make('name'),
                 // TextColumn::make('email_verified_at')
                 //     ->dateTime()
                 //     ->sortable(),
@@ -44,5 +42,4 @@ class ContactFormTable
                 ]),
             ]);
     }
-    
 }

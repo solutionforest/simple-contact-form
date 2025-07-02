@@ -1,24 +1,26 @@
 <?php
 
 namespace SolutionForest\SimpleContactForm\Resources\ContactForms;
-use Filament\Resources\Resource;
-use SolutionForest\SimpleContactForm\Models\ContactForm;
+
 use BackedEnum;
-use Filament\Support\Icons\Heroicon;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\CreateContactForms;
-use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\EditForm;
-use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\ViewInfoList;
-use SolutionForest\SimpleContactForm\Resources\ContactForms\Tables\ContactFormTable;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use SolutionForest\SimpleContactForm\Models\ContactForm;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\CreateContactForms;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\EditContactForms;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\ListContactForms;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\ViewContactForms;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\EditForm;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\ViewInfoList;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\Tables\ContactFormTable;
 
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     public static function form(Schema $schema): Schema
     {
@@ -35,8 +37,7 @@ class ContactFormResource extends Resource
         return ContactFormTable::configure($table);
     }
 
-
-     public static function getPages(): array
+    public static function getPages(): array
     {
         return [
             'index' => ListContactForms::route('/'),
@@ -45,11 +46,4 @@ class ContactFormResource extends Resource
             'edit' => EditContactForms::route('/{record}/edit'),
         ];
     }
-
-
-
-
-    
-
-
 }

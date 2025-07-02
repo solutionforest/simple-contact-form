@@ -2,27 +2,26 @@
 
 namespace SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas;
 
-use Dom\Text;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Illuminate\Support\HtmlString;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\Action;
-use Filament\Forms\Components\ToggleButtons;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
+
 class EditForm
-{   
+{
     public $record;
 
     public $data = [];
@@ -41,7 +40,7 @@ class EditForm
                 ],
             ];
         }
-                //  else {
+        //  else {
         //     $content = $this->record->content ?? [];
 
         //     // Check if content needs to be migrated to UUID format
@@ -81,14 +80,14 @@ class EditForm
         //                 'items' => $newItems,
         //             ];
         //         }
-         //         $this->record->content = $newContent;
+        //         $this->record->content = $newContent;
         //         $this->data['content'] = $newContent;
         //     } else {
         //         $this->data['content'] = $content;
         //     }
         // }
     }
-        
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -116,12 +115,12 @@ class EditForm
                                     ->deletable(false)
                                     ->live()
                                     ->afterStateHydrated(function (Repeater $component, $state) {
-                                        if (!empty($state)) {
+                                        if (! empty($state)) {
                                             $needsUpdate = false;
                                             $items = $state;
 
                                             foreach ($items as $key => $item) {
-                                                if (!isset($item['id'])) {
+                                                if (! isset($item['id'])) {
                                                     $needsUpdate = true;
 
                                                     break;
@@ -170,92 +169,92 @@ class EditForm
                                             ->columnSpanFull()
                                             ->collapsed(true)
                                             ->collapsible(false)
-                                            ->itemLabel(fn(array $state): ?string => $state['string'] ?? null)
-                                        ->extraItemActions([
-                                            Action::make('edit')
-                                                ->label(__('simple-contact-form::simple-contact-form.form.edit'))
-                                                ->icon('heroicon-o-pencil')
-                                                ->schema(function (array $arguments, $livewire, $state, Repeater $component) {
-                                                    $content = $livewire->data['content'] ?? [];
+                                            ->itemLabel(fn (array $state): ?string => $state['string'] ?? null)
+                                            ->extraItemActions([
+                                                Action::make('edit')
+                                                    ->label(__('simple-contact-form::simple-contact-form.form.edit'))
+                                                    ->icon('heroicon-o-pencil')
+                                                    ->schema(function (array $arguments, $livewire, $state, Repeater $component) {
+                                                        $content = $livewire->data['content'] ?? [];
 
-                                                    $items = $component->getState() ?? [];
+                                                        $items = $component->getState() ?? [];
 
-                                                    $itemKey = $arguments['item'] ?? null;
-                                                    $item = $items[$itemKey] ?? null;
+                                                        $itemKey = $arguments['item'] ?? null;
+                                                        $item = $items[$itemKey] ?? null;
 
-                                                    // $record = $content[$item['section']]['items'][$itemKey];
-                                                    $record = null;
-                                                    foreach ($content as $sectionIndex => $section) {
-                                                        if (isset($section['items'][$itemKey])) {
-                                                            $record = $section['items'][$itemKey];
-
-                                                            break;
-                                                        }
-                                                    }
-
-                                                    if (! $record) {
-                                                        // Handle case when item is not found
-                                                        return []; // Or whatever default form you want to show
-                                                    }
-
-                                                    $type = $record['type'] ?? 'text';
-
-                                                    $formSchema = self::getModalForm($type, $content);
-                                                    foreach ($formSchema as &$field) {
-                                                        $fieldName = $field->getName();
-                                                        if (isset($record[$fieldName])) {
-                                                            $field->default($record[$fieldName]);
-                                                        }
-                                                    }
-
-                                                    return $formSchema;
-                                                })
-                                                ->action(function (array $data, $livewire, $arguments) {
-                                                    $content = $livewire->data['content'] ?? [];
-                                                    $itemIndex = $arguments['item'] ?? null;
-                                                    $originalSection = null;
-                                                    $originalItem = null;
-
-                                                    foreach ($content as $sectionIndex => $section) {
-                                                        if (isset($section['items'][$itemIndex])) {
-                                                            $originalSection = $sectionIndex;
-                                                            $originalItem = $section['items'][$itemIndex];
-
-                                                            break;
-                                                        }
-                                                    }
-
-                                                    if ($originalSection === null) {
-                                                        return;
-                                                    }
-
-                                                    $targetSectionId = $data['section'] ?? null;
-                                                    $targetSection = $originalSection;
-
-                                                    if ($targetSectionId !== null) {
-                                                        foreach ($content as $uuid => $section) {
-                                                            if (isset($section['id']) && $section['id'] == $targetSectionId) {
-                                                                $targetSection = $uuid;
+                                                        // $record = $content[$item['section']]['items'][$itemKey];
+                                                        $record = null;
+                                                        foreach ($content as $sectionIndex => $section) {
+                                                            if (isset($section['items'][$itemKey])) {
+                                                                $record = $section['items'][$itemKey];
 
                                                                 break;
                                                             }
                                                         }
-                                                    }
-                                                    $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
 
-                                                    if ($originalSection != $targetSection) {
-                                                        unset($content[$originalSection]['items'][$itemIndex]);
-                                                        $content[$targetSection]['items'][$itemIndex] = $newItem;
-                                                    } else {
-                                                        $content[$originalSection]['items'][$itemIndex] = $newItem;
-                                                    }
+                                                        if (! $record) {
+                                                            // Handle case when item is not found
+                                                            return []; // Or whatever default form you want to show
+                                                        }
 
-                                                    $livewire->data['content'] = $content;
-                                                }),
-                                        ]),
+                                                        $type = $record['type'] ?? 'text';
+
+                                                        $formSchema = self::getModalForm($type, $content);
+                                                        foreach ($formSchema as &$field) {
+                                                            $fieldName = $field->getName();
+                                                            if (isset($record[$fieldName])) {
+                                                                $field->default($record[$fieldName]);
+                                                            }
+                                                        }
+
+                                                        return $formSchema;
+                                                    })
+                                                    ->action(function (array $data, $livewire, $arguments) {
+                                                        $content = $livewire->data['content'] ?? [];
+                                                        $itemIndex = $arguments['item'] ?? null;
+                                                        $originalSection = null;
+                                                        $originalItem = null;
+
+                                                        foreach ($content as $sectionIndex => $section) {
+                                                            if (isset($section['items'][$itemIndex])) {
+                                                                $originalSection = $sectionIndex;
+                                                                $originalItem = $section['items'][$itemIndex];
+
+                                                                break;
+                                                            }
+                                                        }
+
+                                                        if ($originalSection === null) {
+                                                            return;
+                                                        }
+
+                                                        $targetSectionId = $data['section'] ?? null;
+                                                        $targetSection = $originalSection;
+
+                                                        if ($targetSectionId !== null) {
+                                                            foreach ($content as $uuid => $section) {
+                                                                if (isset($section['id']) && $section['id'] == $targetSectionId) {
+                                                                    $targetSection = $uuid;
+
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
+
+                                                        if ($originalSection != $targetSection) {
+                                                            unset($content[$originalSection]['items'][$itemIndex]);
+                                                            $content[$targetSection]['items'][$itemIndex] = $newItem;
+                                                        } else {
+                                                            $content[$originalSection]['items'][$itemIndex] = $newItem;
+                                                        }
+
+                                                        $livewire->data['content'] = $content;
+                                                    }),
+                                            ]),
                                     ])
                                     ->defaultItems(2),
-                                    ]),
+                            ]),
                         Tab::make('Mail')
                             ->label(__('simple-contact-form::simple-contact-form.form.mail'))
                             ->schema([
@@ -336,7 +335,7 @@ class EditForm
                                 //     $set('extra_attributes', $attributes);
                                 // })
                             ]),
-                        
+
                     ])
                     ->columnSpanFull(),
 
@@ -383,19 +382,19 @@ class EditForm
                     if (! isset($content[$sectionUuid]['items'])) {
                         $content[$sectionUuid]['items'] = [];
                     }
-                                    $itemUuid = \Illuminate\Support\Str::uuid()->toString();
+                    $itemUuid = \Illuminate\Support\Str::uuid()->toString();
                     $content[$sectionUuid]['items'][$itemUuid] = $newItem;
 
                     $livewire->data['content'] = $content;
 
                 });
-                
+
         }
 
         return $actions;
     }
 
-     public static function getModalForm($actionType, $content = null): array
+    public static function getModalForm($actionType, $content = null): array
     {
 
         $fields = [];
@@ -655,11 +654,4 @@ class EditForm
 
         return $newItem;
     }
-
-   
-
-
-
-
-
 }

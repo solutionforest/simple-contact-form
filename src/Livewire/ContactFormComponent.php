@@ -1,64 +1,69 @@
 <?php
 
 namespace SolutionForest\SimpleContactForm\Livewire;
-use Filament\Schemas\Schema;
-use Livewire\Component;
-use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Schemas\Concerns\InteractsWithSchemas;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\TextInput;
-use SolutionForest\SimpleContactForm\Models\ContactForm;
+
 use Exception;
-// use Livewire\WithFileUploads;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Illuminate\Support\Facades\Mail;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Flex;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+// use Livewire\WithFileUploads;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Concerns\InteractsWithSchemas;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Mail;
+use Livewire\Component;
+use SolutionForest\SimpleContactForm\Models\ContactForm;
+
 class ContactFormComponent extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
+
     // use WithFileUploads;
     public ?array $data = [];
+
     public ContactForm $contactForm;
+
     public ?string $customClass = null;
+
     public ?string $formId = null;
+
     public $referencedFields = [];
-    
+
     public function mount($id, $customClass = null): void
-        {
+    {
 
-            $this->formId = $id;
+        $this->formId = $id;
 
-            try {
-                $this->contactForm = ContactForm::findOrFail($id);
-                $this->form->fill();
-            } catch (Exception $e) {
-                $this->contactForm = new ContactForm;
-                $this->addError('formError', __('simple-contact-form::simple-contact-form.errors.form_not_found'));
-            }
-
-            // if ($this->contactForm->extra_attributes) {
-            //     $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
-            // } else {
-            //     $this->customClass = $customClass;
-            // }
-
-            if (isset($this->contactForm->extra_attributes) && $this->contactForm->extra_attributes) {
-                $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
-            } else {
-                $this->customClass = $customClass;
-            }
+        try {
+            $this->contactForm = ContactForm::findOrFail($id);
+            $this->form->fill();
+        } catch (Exception $e) {
+            $this->contactForm = new ContactForm;
+            $this->addError('formError', __('simple-contact-form::simple-contact-form.errors.form_not_found'));
         }
+
+        // if ($this->contactForm->extra_attributes) {
+        //     $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
+        // } else {
+        //     $this->customClass = $customClass;
+        // }
+
+        if (isset($this->contactForm->extra_attributes) && $this->contactForm->extra_attributes) {
+            $this->customClass = $this->formatAttributesForHtml($this->contactForm->extra_attributes);
+        } else {
+            $this->customClass = $customClass;
+        }
+    }
+
     public function form(Schema $schema): Schema
-    {   
+    {
         $schemaContent = [];
         foreach ($this->contactForm->content ?? [] as $section) {
             if (empty($section['items'])) {
@@ -84,23 +89,22 @@ class ContactFormComponent extends Component implements HasSchemas
                 ->schema($sectionFields)
                 ->columnSpan(6)
                 ->contained(false);
-                
+
         }
+
         return $schema
             ->components([
                 Flex::make(
                     function (Flex $flex) use ($schemaContent) {
                         $flex->schema($schemaContent);
                     }
-                )
-               
+                ),
 
-                    
-               
             ])
             ->statePath('data');
     }
-     private function getFieldSchema(string $type, array $field)
+
+    private function getFieldSchema(string $type, array $field)
     {
         $name = $field['name'] ?? '';
         $label = $field['label'] ?? '';
@@ -255,6 +259,7 @@ class ContactFormComponent extends Component implements HasSchemas
             }
             $text = str_replace($matches[0][$key], $varValue, $text);
         }
+
         return $text;
     }
 
@@ -276,6 +281,7 @@ class ContactFormComponent extends Component implements HasSchemas
 
         return false;
     }
+
     private function formatAttributesForHtml(?string $attributesText): string
     {
         if (empty($attributesText)) {
@@ -300,10 +306,11 @@ class ContactFormComponent extends Component implements HasSchemas
 
         return implode(' ', $result);
     }
+
     public function render()
     {
         return view('simple-contact-form::livewire.contact-form-component', [
-            'form' => $this->form ,
+            'form' => $this->form,
         ]);
     }
 }

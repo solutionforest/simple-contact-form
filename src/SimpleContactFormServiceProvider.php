@@ -9,13 +9,14 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Features\SupportTesting\Testable;
+use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
+use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
-use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
-use Illuminate\Support\Facades\Blade;
+
 class SimpleContactFormServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'simple-contact-form';
@@ -59,7 +60,6 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
                 ], 'simple-contact-form-lang');
             }
         }
-        
 
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);

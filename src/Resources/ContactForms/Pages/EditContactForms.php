@@ -2,10 +2,10 @@
 
 namespace SolutionForest\SimpleContactForm\Resources\ContactForms\Pages;
 
-use SolutionForest\SimpleContactForm\Resources\ContactForms\ContactFormResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\ContactFormResource;
 
 class EditContactForms extends EditRecord
 {
