@@ -15,8 +15,8 @@ class SimpleContactFormPlugin implements Plugin
     }
 
     public function register(Panel $panel): void
-    {
-         $panel->resources([
+    {   
+        $panel->resources([
             ContactFormsContactFormResource::class,
         ]);
     }
