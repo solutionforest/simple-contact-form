@@ -9,7 +9,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TextInput;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 use Exception;
-use Livewire\WithFileUploads;
+// use Livewire\WithFileUploads;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Select;
@@ -21,10 +21,11 @@ use Illuminate\Support\Facades\Mail;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Fieldset;
 class ContactFormComponent extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
-    use WithFileUploads;
+    // use WithFileUploads;
     public ?array $data = [];
     public ContactForm $contactForm;
     public ?string $customClass = null;
@@ -78,14 +79,12 @@ class ContactFormComponent extends Component implements HasSchemas
             if (empty($sectionFields)) {
                 continue;
             }
-            $schemaContent[] = Section::make()
+            $schemaContent[] = Fieldset::make()
                 ->columns(1)
                 ->schema($sectionFields)
                 ->columnSpan(6)
-                ->extraAttributes([
-                    'class' => 'p-0 border-none',
-                    ]  
-                );
+                ->contained(false);
+                
         }
         return $schema
             ->components([
@@ -94,6 +93,8 @@ class ContactFormComponent extends Component implements HasSchemas
                         $flex->schema($schemaContent);
                     }
                 )
+               
+
                     
                
             ])
