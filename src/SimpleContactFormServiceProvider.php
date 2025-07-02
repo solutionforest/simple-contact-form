@@ -15,7 +15,7 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use SolutionForest\SimpleContactForm\Commands\SimpleContactFormCommand;
 use SolutionForest\SimpleContactForm\Testing\TestsSimpleContactForm;
-
+use Illuminate\Support\Facades\Blade;
 class SimpleContactFormServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'simple-contact-form';
@@ -51,10 +51,24 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
 
         if (file_exists($package->basePath('/../resources/lang'))) {
             $package->hasTranslations();
+
+            // Register language files for publishing separately
+            if (app()->runningInConsole()) {
+                $this->publishes([
+                    $package->basePath('/../resources/lang') => resource_path('lang/vendor/simple-contact-form'),
+                ], 'simple-contact-form-lang');
+            }
         }
+        
 
         if (file_exists($package->basePath('/../resources/views'))) {
             $package->hasViews(static::$viewNamespace);
+        }
+        if (class_exists(\Livewire\Livewire::class)) {
+            \Livewire\Livewire::component('contact-form', \SolutionForest\SimpleContactForm\Livewire\ContactFormComponent::class);
+        }
+        if (class_exists(Blade::class)) {
+            Blade::component('simple-contact-form', \SolutionForest\SimpleContactForm\View\Components\SimpleContactForm::class);
         }
     }
 
