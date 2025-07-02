@@ -25,10 +25,10 @@ class ContactFormResource extends Resource
         return EditForm::configure($schema);
     }
 
-    public static function infolist(Schema $schema): Schema
-    {
-        return ViewInfoList::configure($schema);
-    }
+    // public static function infolist(Schema $schema): Schema
+    // {
+    //     return ViewInfoList::configure($schema);
+    // }
 
     public static function table(Table $table): Table
     {
