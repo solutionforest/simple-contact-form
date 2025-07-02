@@ -4,6 +4,8 @@ namespace SolutionForest\SimpleContactForm;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use SolutionForest\SimpleContactForm\Resources\ContactFormResource;
+use SolutionForest\SimpleContactForm\Resources\ContactForms\ContactFormResource as ContactFormsContactFormResource;
 
 class SimpleContactFormPlugin implements Plugin
 {
@@ -14,12 +16,16 @@ class SimpleContactFormPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        //
+         $panel->resources([
+            ContactFormsContactFormResource::class,
+        ]);
     }
 
     public function boot(Panel $panel): void
     {
-        //
+       
+
+       
     }
 
     public static function make(): static
