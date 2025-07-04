@@ -33,6 +33,14 @@ You can install the package via composer:
 composer require solution-forest/simple-contact-form
 ```
 
+For Filament v4, use the v2.0.0 version:
+
+```bash
+composer require solution-forest/simple-contact-form:^2.0.0
+```
+
+
+
 You can publish and run the migrations with:
 
 ```bash
@@ -146,6 +154,14 @@ Use the Blade component with form id in your views:
             ],
     }
     ```
+- If you are using Filament v4, you need to add Filament theme styles to use their components. Add the following to your `app.css`:
+    ```css
+    @import '../../vendor/filament/filament/resources/css/theme.css';
+
+    @source '../../app/Filament/**/*';
+    @source '../../resources/views/filament/**/*';
+    ```
+
 
 
 ## Testing
