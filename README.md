@@ -25,6 +25,12 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 - ⚙️ **Configuration Options** - Adjustable settings for forms
 - 💾 **Submission Storage** - Save and manage form submissions
 
+### Supported Filament versions
+| Filament Version | Plugin Version |
+|------------------|----------------|
+| v3               | 0.0.2          |
+| v4               | 2.0.0          |
+
 ## Installation
 
 You can install the package via composer:
