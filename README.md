@@ -129,7 +129,8 @@ Use the Blade component with form id in your views:
 ![image](https://github.com/user-attachments/assets/a8ca1358-2fac-41fa-a513-eab73d5fd015)
 ![image](https://github.com/user-attachments/assets/b79934f5-070e-4e82-a9cc-1cf0a0fc8501)
 ![image](https://github.com/user-attachments/assets/b92d9f24-431e-4acc-98c5-a6c4961b0231)
-<img width="654" alt="image" src="https://github.com/user-attachments/assets/bcabed84-f5e3-4c73-a291-52e89274f20b" />
+<img width="647" alt="image" src="https://github.com/user-attachments/assets/639b0333-ee95-45a1-b002-764f23904083" />
+
 
 
 
