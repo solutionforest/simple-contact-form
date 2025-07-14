@@ -17,7 +17,7 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 - 📧 **Email Notifications** - Receive form submissions via email
 - 📱 **Responsive Design** - Mobile-friendly forms out of the box
 
-## Coming Soon
+## Coming Soon (Pro Version)
 
 - 📁 **File Upload** - Support for file attachments in forms
 - 🪝 **Form Hooks** - Before/after submit hooks for custom logic
