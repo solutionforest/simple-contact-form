@@ -403,11 +403,14 @@ class ContactFormResource extends Resource
             'edit' => Pages\EditContactForm::route('/{record}/edit'),
         ];
     }
-    public static function getActionList(){
+
+    public static function getActionList()
+    {
         return ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
     }
+
     public static function getModelaction(): array
-    {   
+    {
         $actionsList = static::getActionList();
         $actions = [];
 
