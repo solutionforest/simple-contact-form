@@ -106,7 +106,7 @@ class ContactFormResource extends Resource
                         Tabs\Tab::make('Template')
                             ->label(__('simple-contact-form::simple-contact-form.form.template'))
                             ->schema([
-                                Forms\Components\Actions::make(self::getModelaction()),
+                                Forms\Components\Actions::make(static::getModelaction()),
                                 Placeholder::make('content_placeholder')
                                     ->label(__('simple-contact-form::simple-contact-form.form.usage'))
                                     ->content(new HtmlString(__('simple-contact-form::simple-contact-form.form.usage_content')))
@@ -203,7 +203,7 @@ class ContactFormResource extends Resource
 
                                                         $type = $record['type'] ?? 'text';
 
-                                                        $formSchema = self::getModalForm($type, $content);
+                                                        $formSchema = static::getModalForm($type, $content);
                                                         foreach ($formSchema as &$field) {
                                                             $fieldName = $field->getName();
                                                             if (isset($record[$fieldName])) {
@@ -245,7 +245,7 @@ class ContactFormResource extends Resource
                                                                 }
                                                             }
                                                         }
-                                                        $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
+                                                        $newItem = static::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
 
                                                         if ($originalSection != $targetSection) {
                                                             unset($content[$originalSection]['items'][$itemIndex]);
@@ -403,10 +403,12 @@ class ContactFormResource extends Resource
             'edit' => Pages\EditContactForm::route('/{record}/edit'),
         ];
     }
-
+    public static function getActionList(){
+        return ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
+    }
     public static function getModelaction(): array
-    {
-        $actionsList = ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
+    {   
+        $actionsList = static::getActionList();
         $actions = [];
 
         foreach ($actionsList as $actionType) {
@@ -417,12 +419,12 @@ class ContactFormResource extends Resource
                     function (array $data, $livewire) use ($actionType) {
                         $content = $livewire->data['content'] ?? [];
 
-                        return self::getModalForm($actionType, $content);
+                        return static::getModalForm($actionType, $content);
                     }
                 )
                 ->action(function (array $data, $livewire) use ($actionType) {
                     $content = $livewire->data['content'] ?? [];
-                    $newItem = self::handleContentAdd($data, $actionType);
+                    $newItem = static::handleContentAdd($data, $actionType);
                     $sectionId = $data['section'] ?? 0;
 
                     $sectionUuid = null;
@@ -458,7 +460,6 @@ class ContactFormResource extends Resource
 
     public static function getModalForm($actionType, $content = null): array
     {
-
         $fields = [];
         if ($content) {
             $fields[] = ToggleButtons::make('section')

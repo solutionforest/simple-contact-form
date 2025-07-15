@@ -145,7 +145,7 @@ class ContactFormComponent extends Component implements HasForms
             ->statePath('data');
     }
 
-    private function getFieldSchema(string $type, array $field)
+    public function getFieldSchema(string $type, array $field)
     {
         $name = $field['name'] ?? '';
         $label = $field['label'] ?? '';
@@ -273,7 +273,7 @@ class ContactFormComponent extends Component implements HasForms
         }
     }
 
-    private function replaceVariables(string $text, array $data): string
+    protected function replaceVariables(string $text, array $data): string
     {
         $this->referencedFields = [];
         preg_match_all('/\{\{([^}]+)\}\}/', $text, $matches);
