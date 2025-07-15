@@ -76,6 +76,7 @@ return [
         'select' => 'Select',
         'radio' => 'Radio',
         'checkbox' => 'Checkbox',
+        'file' => 'File',
     ],
     'no_variables' => 'No variables available',
     'errors' => [
