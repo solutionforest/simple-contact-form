@@ -1,5 +1,5 @@
 
-<div class="inline-block w-auto">
+<div class="w-auto">
     @once
         @livewireStyles
         @filamentStyles

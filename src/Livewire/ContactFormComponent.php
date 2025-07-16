@@ -232,7 +232,7 @@ class ContactFormComponent extends Component implements HasSchemas
         }
     }
 
-    private function replaceVariables(string $text, array $data): string
+    public function replaceVariables(string $text, array $data): string
     {
         $this->referencedFields = [];
         preg_match_all('/\{\{([^}]+)\}\}/', $text, $matches);

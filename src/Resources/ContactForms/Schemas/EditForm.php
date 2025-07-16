@@ -101,7 +101,7 @@ class EditForm
                     ->tabs([
                         Tab::make('Template')
                             ->schema([
-                                ActionGroup::make(self::getModelaction())
+                                ActionGroup::make(static::getModelaction())
                                     ->buttonGroup(),
                                 Placeholder::make('content_placeholder')
                                     ->label(__('simple-contact-form::simple-contact-form.form.usage'))
@@ -199,7 +199,7 @@ class EditForm
 
                                                         $type = $record['type'] ?? 'text';
 
-                                                        $formSchema = self::getModalForm($type, $content);
+                                                        $formSchema = static::getModalForm($type, $content);
                                                         foreach ($formSchema as &$field) {
                                                             $fieldName = $field->getName();
                                                             if (isset($record[$fieldName])) {
@@ -240,7 +240,7 @@ class EditForm
                                                                 }
                                                             }
                                                         }
-                                                        $newItem = self::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
+                                                        $newItem = static::handleContentAdd($data, $data['type'] ?? $originalItem['type'] ?? 'text');
 
                                                         if ($originalSection != $targetSection) {
                                                             unset($content[$originalSection]['items'][$itemIndex]);
@@ -341,10 +341,13 @@ class EditForm
 
             ]);
     }
+    public static function getActionList(){
+        return ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
+    }
 
     public static function getModelaction(): array
     {
-        $actionsList = ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
+        $actionsList = static::getActionList();
         $actions = [];
 
         foreach ($actionsList as $actionType) {
@@ -355,12 +358,12 @@ class EditForm
                     function (array $data, $livewire) use ($actionType) {
                         $content = $livewire->data['content'] ?? [];
 
-                        return self::getModalForm($actionType, $content);
+                        return static::getModalForm($actionType, $content);
                     }
                 )
                 ->action(function (array $data, $livewire) use ($actionType) {
                     $content = $livewire->data['content'] ?? [];
-                    $newItem = self::handleContentAdd($data, $actionType);
+                    $newItem = static::handleContentAdd($data, $actionType);
                     $sectionId = $data['section'] ?? 0;
 
                     $sectionUuid = null;
