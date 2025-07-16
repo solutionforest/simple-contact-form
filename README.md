@@ -28,7 +28,7 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 | Filament Version | Plugin Version |
 |------------------|----------------|
 | v3               | 0.0.2          |
-| v4               | 2.0.0          |
+| v4               | 2.0.1          |
 
 ## Installation
 
