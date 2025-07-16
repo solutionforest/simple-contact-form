@@ -341,7 +341,9 @@ class EditForm
 
             ]);
     }
-    public static function getActionList(){
+
+    public static function getActionList()
+    {
         return ['text', 'date', 'textarea', 'select', 'radio',  'checkbox'];
     }
 
