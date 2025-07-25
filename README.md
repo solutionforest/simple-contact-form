@@ -23,7 +23,10 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 - 🪝 **Form Hooks** - Before/after submit hooks for custom logic
 - ⚙️ **Configuration Options** - Adjustable settings for forms
 - 💾 **Submission Storage** - Save and manage form submissions
-
+  
+## Try Pro Version Now
+     https://checkout.anystack.sh/simple-contact-form-pro
+ 
 ### Supported Filament versions
 | Filament Version | Plugin Version |
 |------------------|----------------|
