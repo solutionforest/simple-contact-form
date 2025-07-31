@@ -36,6 +36,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
                 $command
                     ->publishConfigFile()
                     ->publishMigrations()
+                    ->publishAssets() // This will publish the CSS file
                     ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('solutionforest/simple-contact-form');
             });
@@ -97,6 +98,11 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
                     $file->getRealPath() => base_path("stubs/simple-contact-form/{$file->getFilename()}"),
                 ], 'simple-contact-form-stubs');
             }
+            
+            // Publish bundled CSS with Filament styles
+            $this->publishes([
+                __DIR__ . '/../resources/dist/simple-contact-form.css' => public_path('vendor/simple-contact-form/simple-contact-form.css'),
+            ], 'simple-contact-form-assets');
         }
         //   if (class_exists(\Filament\Facades\Filament::class)) {
         //     \Filament\Facades\Filament::registerPlugin(

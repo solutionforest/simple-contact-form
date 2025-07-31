@@ -1,6 +1,10 @@
 
-<div class="w-auto">
+<div class="simple-contact-form-wrapper w-auto">
     @once
+        {{-- Load bundled Filament styles --}}
+        @if(!app()->environment('testing'))
+            <link rel="stylesheet" href="{{ asset('vendor/simple-contact-form/simple-contact-form.css') }}">
+        @endif
         @livewireStyles
         @filamentStyles
         @livewire('notifications')
@@ -12,7 +16,7 @@
             Contact form not found. Please provide a valid form ID.
         </div>
     @endif
-  @once
+    @once
         @livewireScripts
         @filamentScripts
     @endonce

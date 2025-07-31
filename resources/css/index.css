@@ -1,6 +1,9 @@
-/* @tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
-@tailwind variants; */
-@import '../../vendor/filament/filament/resources/css/theme.css'; 
 
+/* Import all Filament styles for complete form functionality */
+@import '../../vendor/filament/filament/resources/css/theme.css';
+@import '../../vendor/filament/forms/resources/css/index.css';
+@import '../../vendor/filament/support/resources/css/index.css';
+@import '../../vendor/filament/notifications/resources/css/index.css';

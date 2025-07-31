@@ -1,4 +1,5 @@
 
+<div class="simple-contact-form-wrapper">
     <form wire:submit="create" {!! $this->customClass !!}>
         <div>
             {{ $this->form }}
@@ -11,5 +12,4 @@
             </div>
         @endif
     </form>
-
-  
+</div>
