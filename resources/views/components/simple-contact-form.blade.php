@@ -9,7 +9,7 @@
             @else
                 @vite(['resources/css/app.css'])
             @endif
-        @elseif(!app()->environment('testing'))
+        @else
             <link rel="stylesheet" href="{{ asset('vendor/simple-contact-form/simple-contact-form.css') }}">
         @endif
         @livewireStyles
