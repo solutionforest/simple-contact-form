@@ -98,7 +98,7 @@ class SimpleContactFormServiceProvider extends PackageServiceProvider
                     $file->getRealPath() => base_path("stubs/simple-contact-form/{$file->getFilename()}"),
                 ], 'simple-contact-form-stubs');
             }
-            
+
             // Publish bundled CSS with Filament styles
             $this->publishes([
                 __DIR__ . '/../resources/dist/simple-contact-form.css' => public_path('vendor/simple-contact-form/simple-contact-form.css'),
