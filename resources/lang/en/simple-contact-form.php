@@ -2,6 +2,11 @@
 
 // translations for SolutionForest/SimpleContactForm
 return [
+    // Config related translations
+    'model_label' => 'Contact Form',
+    'plural_model_label' => 'Contact Forms', 
+    'navigation_label' => 'Contact Forms',
+
     'form' => [
         'name' => 'Name',
         'template' => 'Template',

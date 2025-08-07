@@ -21,8 +21,84 @@ use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    
+    /**
+     * Helper method to get localized value from config
+     * If the key exists in locale file, use translation; otherwise use the key directly
+     * Skip for numbers, icons, booleans, and null values
+     */
+    protected static function getLocalizedConfigValue(string $configKey, $default = null)
+    {
+        $configValue = config("simple-contact-form.{$configKey}", $default);
+        
+        // Skip localization for numbers, booleans, null, and icons
+        if (is_numeric($configValue) || is_bool($configValue) || is_null($configValue) || 
+            (is_string($configValue) && str_starts_with($configValue, 'heroicon-'))) {
+            return $configValue;
+        }
+        
+        // Try to get translation
+        $translationKey = "simple-contact-form::simple-contact-form.{$configValue}";
+        $translation = __($translationKey);
+        
+        // If translation exists and is different from the key, use it; otherwise use config value
+        return ($translation !== $translationKey) ? $translation : $configValue;
+    }
+    
+    public static function shouldSkipAuthorization(): bool
+    {
+        return config('simple-contact-form.should_skip_auth', true);
+    }
+    
+    public static function getModelLabel(): string
+    {
+        return static::getLocalizedConfigValue('model_label', 'Contact Form');
+    }
+    
+    public static function getPluralModelLabel(): string
+    {
+        return static::getLocalizedConfigValue('plural_model_label', 'Contact Forms');
+    }
+    
+    public static function hasTitleCaseModelLabel(): bool
+    {
+        return config('simple-contact-form.has_title_case_model_label', true);
+    }
+    
+    public static function getNavigationGroup(): ?string
+    {
+        return static::getLocalizedConfigValue('navigation_group', null);
+    }
+    
+    public static function getNavigationLabel(): string
+    {
+        return static::getLocalizedConfigValue('navigation_label', 'Contact Forms');
+    }
+    
+    public static function getNavigationIcon(): string
+    {
+        return config('simple-contact-form.navigation_icon', 'heroicon-o-mail');
+    }
+    
+    public static function getNavigationSort(): ?int
+    {
+        return config('simple-contact-form.navigation_sort', 100);
+    }
+    
+    public static function getNavigationParentItem(): ?string
+    {
+        return static::getLocalizedConfigValue('navigation_parent_item', null);
+    }
+    
+    public static function getSlug(): string
+    {
+        return config('simple-contact-form.slug', 'contact-forms');
+    }
+    
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('simple-contact-form.shouldRegisterNavigation', true);
+    }
 
     public $record;
 
@@ -31,7 +107,7 @@ class ContactFormResource extends Resource
     public function mount(): void
     {
         if (! $this->record?->exists) {
-            $this->data['content'] = [
+             $this->data['content'] = [
                 \Illuminate\Support\Str::uuid()->toString() => [
                     'id' => 0, // Keep id for backward compatibility and UI display
                     'items' => [],
