@@ -24,57 +24,57 @@ class ContactFormResource extends Resource
 
     public static function shouldSkipAuthorization(): bool
     {
-        return self::getPlugin()->getShouldSkipAuth();
+        return static::getPlugin()->getShouldSkipAuth();
     }
 
     public static function getModelLabel(): string
     {
-        return self::getPlugin()->getModelLabel();
+        return static::getPlugin()->getModelLabel();
     }
 
     public static function getPluralModelLabel(): string
     {
-        return self::getPlugin()->getPluralModelLabel();
+        return static::getPlugin()->getPluralModelLabel();
     }
 
     public static function hasTitleCaseModelLabel(): bool
     {
-        return self::getPlugin()->getHasTitleCaseModelLabel();
+        return static::getPlugin()->getHasTitleCaseModelLabel();
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return self::getPlugin()->getNavigationGroup();
+        return static::getPlugin()->getNavigationGroup();
     }
 
     public static function getNavigationLabel(): string
     {
-        return self::getPlugin()->getNavigationLabel();
+        return static::getPlugin()->getNavigationLabel();
     }
 
     public static function getNavigationIcon(): string
     {
-        return self::getPlugin()->getNavigationIcon();
+        return static::getPlugin()->getNavigationIcon();
     }
 
     public static function getNavigationSort(): int
     {
-        return self::getPlugin()->getNavigationSort();
+        return static::getPlugin()->getNavigationSort();
     }
 
     public static function getNavigationParentItem(): ?string
     {
-        return self::getPlugin()->getNavigationParentItem();
+        return static::getPlugin()->getNavigationParentItem();
     }
 
     public static function getSlug(): string
     {
-        return self::getPlugin()->getSlug();
+        return static::getPlugin()->getSlug();
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return self::getPlugin()->getShouldRegisterNavigation();
+        return static::getPlugin()->getShouldRegisterNavigation();
     }
 
     protected static function getPlugin(): \SolutionForest\SimpleContactForm\SimpleContactFormPlugin
