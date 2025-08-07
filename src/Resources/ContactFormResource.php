@@ -21,68 +21,66 @@ use SolutionForest\SimpleContactForm\Resources\ContactFormResource\Pages;
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
-    
+
     public static function shouldSkipAuthorization(): bool
     {
         return self::getPlugin()->getShouldSkipAuth();
     }
-    
+
     public static function getModelLabel(): string
     {
         return self::getPlugin()->getModelLabel();
     }
-    
+
     public static function getPluralModelLabel(): string
     {
         return self::getPlugin()->getPluralModelLabel();
     }
-    
+
     public static function hasTitleCaseModelLabel(): bool
     {
         return self::getPlugin()->getHasTitleCaseModelLabel();
     }
-    
+
     public static function getNavigationGroup(): ?string
     {
         return self::getPlugin()->getNavigationGroup();
     }
-    
+
     public static function getNavigationLabel(): string
     {
         return self::getPlugin()->getNavigationLabel();
     }
-    
+
     public static function getNavigationIcon(): string
     {
         return self::getPlugin()->getNavigationIcon();
     }
-    
+
     public static function getNavigationSort(): int
     {
         return self::getPlugin()->getNavigationSort();
     }
-    
+
     public static function getNavigationParentItem(): ?string
     {
         return self::getPlugin()->getNavigationParentItem();
     }
-    
+
     public static function getSlug(): string
     {
         return self::getPlugin()->getSlug();
     }
-    
+
     public static function shouldRegisterNavigation(): bool
     {
         return self::getPlugin()->getShouldRegisterNavigation();
     }
-    
+
     protected static function getPlugin(): \SolutionForest\SimpleContactForm\SimpleContactFormPlugin
     {
         return \SolutionForest\SimpleContactForm\SimpleContactFormPlugin::get();
     }
-    
-
 
     public $record;
 
@@ -93,7 +91,7 @@ class ContactFormResource extends Resource
         if (! $this->record?->exists) {
             $uuid1 = \Illuminate\Support\Str::uuid()->toString();
             $uuid2 = \Illuminate\Support\Str::uuid()->toString();
-            
+
             $this->data['content'] = [
                 $uuid1 => [
                     'id' => 0, // Keep id for backward compatibility and UI display
