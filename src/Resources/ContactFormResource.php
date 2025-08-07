@@ -22,83 +22,67 @@ class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
     
-    /**
-     * Helper method to get localized value from config
-     * If the key exists in locale file, use translation; otherwise use the key directly
-     * Skip for numbers, icons, booleans, and null values
-     */
-    protected static function getLocalizedConfigValue(string $configKey, $default = null)
-    {
-        $configValue = config("simple-contact-form.{$configKey}", $default);
-        
-        // Skip localization for numbers, booleans, null, and icons
-        if (is_numeric($configValue) || is_bool($configValue) || is_null($configValue) || 
-            (is_string($configValue) && str_starts_with($configValue, 'heroicon-'))) {
-            return $configValue;
-        }
-        
-        // Try to get translation
-        $translationKey = "simple-contact-form::simple-contact-form.{$configValue}";
-        $translation = __($translationKey);
-        
-        // If translation exists and is different from the key, use it; otherwise use config value
-        return ($translation !== $translationKey) ? $translation : $configValue;
-    }
-    
     public static function shouldSkipAuthorization(): bool
     {
-        return config('simple-contact-form.should_skip_auth', true);
+        return self::getPlugin()->getShouldSkipAuth();
     }
     
     public static function getModelLabel(): string
     {
-        return static::getLocalizedConfigValue('model_label', 'Contact Form');
+        return self::getPlugin()->getModelLabel();
     }
     
     public static function getPluralModelLabel(): string
     {
-        return static::getLocalizedConfigValue('plural_model_label', 'Contact Forms');
+        return self::getPlugin()->getPluralModelLabel();
     }
     
     public static function hasTitleCaseModelLabel(): bool
     {
-        return config('simple-contact-form.has_title_case_model_label', true);
+        return self::getPlugin()->getHasTitleCaseModelLabel();
     }
     
     public static function getNavigationGroup(): ?string
     {
-        return static::getLocalizedConfigValue('navigation_group', null);
+        return self::getPlugin()->getNavigationGroup();
     }
     
     public static function getNavigationLabel(): string
     {
-        return static::getLocalizedConfigValue('navigation_label', 'Contact Forms');
+        return self::getPlugin()->getNavigationLabel();
     }
     
     public static function getNavigationIcon(): string
     {
-        return config('simple-contact-form.navigation_icon', 'heroicon-o-mail');
+        return self::getPlugin()->getNavigationIcon();
     }
     
-    public static function getNavigationSort(): ?int
+    public static function getNavigationSort(): int
     {
-        return config('simple-contact-form.navigation_sort', 100);
+        return self::getPlugin()->getNavigationSort();
     }
     
     public static function getNavigationParentItem(): ?string
     {
-        return static::getLocalizedConfigValue('navigation_parent_item', null);
+        return self::getPlugin()->getNavigationParentItem();
     }
     
     public static function getSlug(): string
     {
-        return config('simple-contact-form.slug', 'contact-forms');
+        return self::getPlugin()->getSlug();
     }
     
     public static function shouldRegisterNavigation(): bool
     {
-        return config('simple-contact-form.shouldRegisterNavigation', true);
+        return self::getPlugin()->getShouldRegisterNavigation();
     }
+    
+    protected static function getPlugin(): \SolutionForest\SimpleContactForm\SimpleContactFormPlugin
+    {
+        return \SolutionForest\SimpleContactForm\SimpleContactFormPlugin::get();
+    }
+    
+
 
     public $record;
 
@@ -107,12 +91,15 @@ class ContactFormResource extends Resource
     public function mount(): void
     {
         if (! $this->record?->exists) {
-             $this->data['content'] = [
-                \Illuminate\Support\Str::uuid()->toString() => [
+            $uuid1 = \Illuminate\Support\Str::uuid()->toString();
+            $uuid2 = \Illuminate\Support\Str::uuid()->toString();
+            
+            $this->data['content'] = [
+                $uuid1 => [
                     'id' => 0, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
-                \Illuminate\Support\Str::uuid()->toString() => [
+                $uuid2 => [
                     'id' => 1, // Keep id for backward compatibility and UI display
                     'items' => [],
                 ],
