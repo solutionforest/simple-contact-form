@@ -100,10 +100,10 @@ Simple Contact Form provides a Filament form that can be used outside the Filame
 
 ## Configuration
 
-    You can customize the plugin's resources using the following options:
+You can customize the plugin's resources using the following options:
 
-    ```php
-    SimpleContactFormPlugin::make()
+```php
+SimpleContactFormPlugin::make()
         ->modelLabel('Custom Contact Form') // Singular label for the model
         ->pluralModelLabel('Custom Contact Forms') // Plural label for the model
         ->navigationLabel('My Contact Forms') // Label in the navigation menu
@@ -115,7 +115,7 @@ Simple Contact Form provides a Filament form that can be used outside the Filame
         ->shouldSkipAuth(false) // Require authentication
         ->shouldRegisterNavigation(true) // Show in navigation
         ->hasTitleCaseModelLabel(true); // Use title case for labels
-    ```
+```
 
 ### Customizing Translations
 
