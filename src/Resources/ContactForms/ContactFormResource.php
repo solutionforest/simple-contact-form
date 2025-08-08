@@ -3,10 +3,10 @@
 namespace SolutionForest\SimpleContactForm\Resources\ContactForms;
 
 use BackedEnum;
+use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Panel; 
 use Filament\Tables\Table;
 use SolutionForest\SimpleContactForm\Models\ContactForm;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\CreateContactForms;
@@ -14,18 +14,18 @@ use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\EditContactFor
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\ListContactForms;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Pages\ViewContactForms;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\EditForm;
-use SolutionForest\SimpleContactForm\Resources\ContactForms\Schemas\ViewInfoList;
 use SolutionForest\SimpleContactForm\Resources\ContactForms\Tables\ContactFormTable;
 
 class ContactFormResource extends Resource
 {
     protected static ?string $model = ContactForm::class;
-    
+
     // protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
     public static function getSlug(?Panel $panel = null): string
     {
         return static::getPlugin()->getSlug();
     }
+
     public static function form(Schema $schema): Schema
     {
         return EditForm::configure($schema);
