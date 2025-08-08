@@ -54,7 +54,50 @@ public function panel(Panel $panel): Panel
         ]);
 }
 ```
+Simple Contact Form provides a Filament form that can be used outside the Filament panel, but it requires Filament styles. There are several ways to set this up depending on your environment:
+
+1. **Filament v3 with Tailwind v3:**  
+    Follow the official Filament installation instructions: [https://filamentphp.com/docs/3.x/forms/installation](https://filamentphp.com/docs/3.x/forms/installation).
+
+2. **Filament v3 with Tailwind v4:**  
+    Publish the built-in CSS assets with the following command:
+    ```bash
+    php artisan vendor:publish --tag="simple-contact-form-assets"
+    ```
+
+3. **Filament v4 (expects Tailwind v4):**  
+    Add the following to your `app.css` or your stylesheet:
+    ```css
+    @import '../../vendor/filament/filament/resources/css/theme.css';
+
+    @source '../../app/Filament/**/*';
+    @source '../../resources/views/filament/**/*';
+    ```
+    Then build your assets:
+    ```bash
+    npm run build
+    ```
+
 ## Configuration
+    You can customize the plugin's resources using the following options:
+
+    ```php
+    SimpleContactFormPlugin::make()
+        ->modelLabel('Custom Contact Form') // Singular label for the model
+        ->pluralModelLabel('Custom Contact Forms') // Plural label for the model
+        ->navigationLabel('My Contact Forms') // Label in the navigation menu
+        ->navigationIcon('heroicon-o-envelope') // Icon for navigation
+        ->navigationGroup('Communication') // Group in the navigation
+        ->navigationSort(100) // Sort order in navigation
+        ->navigationParentItem(null) // Parent navigation item (if any)
+        ->slug('contact') // Custom route slug
+        ->shouldSkipAuth(false) // Require authentication
+        ->shouldRegisterNavigation(true) // Show in navigation
+        ->hasTitleCaseModelLabel(true); // Use title case for labels
+    ```
+
+    **How to use:**  
+    Add these methods when registering the plugin in your Panel provider to customize labels, navigation, and behavior to fit your application's needs.
 
 ### Customizing Translations
 
