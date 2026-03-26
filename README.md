@@ -32,7 +32,7 @@ A lightweight, customizable contact form plugin for FilamentPHP that provides an
 | Filament Version | Plugin Version |
 | ---------------- | -------------- |
 | v3               | 0.0.6          |
-| v4/v5            | 2.0.3          |
+| v4/v5            | >=2.0.0        |
 
 ## Installation
 
@@ -40,12 +40,6 @@ You can install the package via composer:
 
 ```bash
 composer require solution-forest/simple-contact-form
-```
-
-For Filament v4/v5, use the following version:
-
-```bash
-composer require solution-forest/simple-contact-form:^2.0.3
 ```
 
 You can publish and run the migrations with:
